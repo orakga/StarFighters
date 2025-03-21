@@ -1,0 +1,22 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{DBDF0AED-4440-A3AE-0FA8-3CB1A2559F64}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "StarFighters",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		}
+	]
+}
