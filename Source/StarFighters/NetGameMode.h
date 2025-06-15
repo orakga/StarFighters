@@ -14,7 +14,8 @@ class STARFIGHTERS_API ANetGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
-	
-	
+	virtual void BeginPlay() override;
+ 	
+	FString serverName = "<Server Name NOT Provided>";
 	
 };
