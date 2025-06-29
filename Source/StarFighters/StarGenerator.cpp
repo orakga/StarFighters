@@ -2,7 +2,7 @@
 
 
 #include "StarGenerator.h"
-
+#include "SFLibrary.h"
 
 // Called when the game starts or when spawned
 void AStarGenerator::BeginPlay()

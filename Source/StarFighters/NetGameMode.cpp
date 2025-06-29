@@ -2,12 +2,13 @@
 
 
 #include "NetGameMode.h"
-
+#include "SFLibrary.h"
 
 void ANetGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	// UE_LOG(LogTemp, Error, TEXT("ANetGameMode::BeginPlay() message from SFLibrary: %s"), *SFLibrary::TestFunc());
 
 	if (FParse::Value(FCommandLine::Get(), TEXT("servername="), serverName))
 	{

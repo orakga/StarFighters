@@ -6,14 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "StarGenerator.generated.h"
 
-#define StarfieldAreaLeft -10000
-#define StarfieldAreaRight 10000
-#define StarfieldAreaFront -10000
-#define StarfieldAreaBack 10000
-#define StarfieldAreaBottom -10000
-#define StarfieldAreaTop -500
-#define StarfieldAreaQuantity 500
-
 
 UCLASS()
 class STARFIGHTERS_API AStarGenerator : public AActor
