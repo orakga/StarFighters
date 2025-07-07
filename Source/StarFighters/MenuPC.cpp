@@ -13,14 +13,14 @@ void AMenuPC::BeginPlay()
 	// Capture PLAYER NAME, then send to Blueprint
 	if (FParse::Value(FCommandLine::Get(), TEXT("playername="), initialPlayerName))
 	{
-		UE_LOG(LogTemp, Error, TEXT("AMenuPC::BeginPlay() Player Name received: %s"), *initialPlayerName);
+		UE_LOG(LogTemp, Warning, TEXT("AMenuPC::BeginPlay() Player Name received: %s"), *initialPlayerName);
 		RegisterPlayerName(initialPlayerName);
 	}
 
 	// Capture SERVER IP, then send to Blueprint
 	if (FParse::Value(FCommandLine::Get(), TEXT("serverip="), initialServerIP))
 	{
-		UE_LOG(LogTemp, Error, TEXT("AMenuPC::BeginPlay() Server IP received: %s"), *initialServerIP);
+		UE_LOG(LogTemp, Warning, TEXT("AMenuPC::BeginPlay() Server IP received: %s"), *initialServerIP);
 		RegisterServerIP(initialServerIP);
 	}
 
