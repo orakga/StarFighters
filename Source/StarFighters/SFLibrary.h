@@ -12,6 +12,7 @@
 #define StarfieldAreaTop -500
 #define StarfieldAreaQuantity 500
 
+#define PlayerNameMaxLength 12
 
 /**
  * 
