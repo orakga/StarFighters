@@ -8,6 +8,11 @@
 #include "NetPC.h"
 
 
+ANetGameMode::ANetGameMode()
+{
+	bStartPlayersAsSpectators = true; // Prevents spawning Pawns immediately upon login
+}
+
 void ANetGameMode::BeginPlay()
 {
 	Super::BeginPlay();

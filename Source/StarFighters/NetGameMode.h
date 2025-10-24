@@ -14,6 +14,8 @@ class STARFIGHTERS_API ANetGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+	ANetGameMode();
+
 	virtual void BeginPlay() override;
  	
 	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;

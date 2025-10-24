@@ -7,6 +7,9 @@
 
 void ANetPC::BeginPlay()
 {
+
+	bShowMouseCursor = true;
+
 	if (PlayerState)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ANetPC::BeginPlay() | PC Name: %s | PS Name: %s | PID: %i"), *GetName(), *PlayerState->GetPlayerName(), PlayerState->GetPlayerId());
