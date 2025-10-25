@@ -22,5 +22,20 @@ public:
 	UFUNCTION(reliable, client)
 		void MessageToClient(const FString& message);
 	
-	
+	virtual void SetupInputComponent() override;
+
+	UPROPERTY(EditAnywhere)
+	class UInputMappingContext* IMC_Spectating;
+
+	UPROPERTY(EditAnywhere)
+	class UInputAction* IA_SpawnShip;
+
+	UPROPERTY(EditAnywhere)
+	class UInputAction* IA_ReturnToMenu;
+
+private:
+
+	void SpawnShip();
+	void ReturnToMenu();
+
 };
