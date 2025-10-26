@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "NetPC.h"
+#include "GameFramework/GameStateBase.h"
 
 
 ANetGameMode::ANetGameMode()
@@ -61,7 +62,6 @@ void ANetGameMode::PostLogin(APlayerController* NewPlayer)
 	// Send the Server Name to the new Client
 	ANetPC* newPC = Cast<ANetPC>(NewPlayer);
 	newPC->MessageToClient("ANetGameMode::PostLogin() | Welcome to: " + serverName);
-
 }
 
 
@@ -98,5 +98,3 @@ void ANetGameMode::Logout(AController* Exiting)
 
 	Super::Logout(Exiting);
 }
-
-

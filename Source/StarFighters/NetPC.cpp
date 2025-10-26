@@ -2,15 +2,21 @@
 
 
 #include "NetPC.h"
+#include "NetGameMode.h"
 #include "GameFramework/PlayerState.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Runtime/Engine/Classes/Engine/World.h"
 
 
 void ANetPC::BeginPlay()
 {
+	Super::BeginPlay();
 
 	bShowMouseCursor = true;
+
+	theGameMode = Cast<ANetGameMode>(UGameplayStatics::GetGameMode(this->GetWorld()));
 
 	if (PlayerState)
 	{
@@ -79,11 +85,45 @@ void ANetPC::SetupInputComponent()
 void ANetPC::SpawnShip()
 {
 	UE_LOG(LogTemp, Error, TEXT("ANetPC::SpawnShip() | %s"), *GetName());
+	Server_SpawnAndPossess();
+}
+
+void ANetPC::Server_SpawnAndPossess_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::Server_SpawnAndPossess() SPAWNING | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+
+	if (GetPawn())
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::Server_SpawnAndPossess() Pawn already exists | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+		return;
+	}
+
+	FVector spawnLocation = FVector(FMath::RandRange(-300, 500), FMath::RandRange(-1000,1000), 0);
+	FTransform spawnTransform = FTransform(FRotator(), spawnLocation);
+	APawn* newShip = theGameMode->SpawnDefaultPawnAtTransform(this, spawnTransform);
+
+	if (!newShip)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::Server_SpawnAndPossess() NO NEW SHIP! | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::Server_SpawnAndPossess() NEW SHIP SPAWNED! | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+
+	Possess(newShip);
+
+	if (GetPawn())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ANetPC::Server_SpawnAndPossess() I HAVE A SHIP! OOOOOOOOOOOOO | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::Server_SpawnAndPossess() NO SHIP! XXXXXXXXXXXXX | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+	}
 }
 
 void ANetPC::ReturnToMenu()
 {
 	UE_LOG(LogTemp, Error, TEXT("ANetPC::ReturnToMenu() | %s"), *GetName());
-
 	ClientTravel("MainMenu", ETravelType::TRAVEL_Absolute);
 }

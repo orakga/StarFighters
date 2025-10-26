@@ -26,5 +26,5 @@ class STARFIGHTERS_API ANetGameMode : public AGameModeBase
 	virtual void Logout(AController* Exiting) override;
 
 	FString serverName = "<Server Name NOT Provided>";
-	
+
 };

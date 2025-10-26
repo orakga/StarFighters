@@ -13,7 +13,7 @@ UCLASS()
 class STARFIGHTERS_API ANetPC : public APlayerController
 {
 	GENERATED_BODY()
-	
+
 	virtual void BeginPlay() override;
 	virtual void OnRep_PlayerState() override;
 
@@ -36,6 +36,11 @@ public:
 private:
 
 	void SpawnShip();
+
+	UFUNCTION(reliable, Server)
+		void Server_SpawnAndPossess();
+
 	void ReturnToMenu();
 
+	class ANetGameMode* theGameMode;
 };
