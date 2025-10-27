@@ -33,6 +33,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInputAction* IA_ReturnToMenu;
 
+	void AssignShipToPlayer();
+
 private:
 
 	void SpawnShip();
@@ -43,4 +45,5 @@ private:
 	void ReturnToMenu();
 
 	class ANetGameMode* theGameMode;
+	class ANetPawn* myShip;
 };

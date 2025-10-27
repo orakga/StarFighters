@@ -3,6 +3,7 @@
 
 #include "NetPC.h"
 #include "NetGameMode.h"
+#include "NetPawn.h"
 #include "GameFramework/PlayerState.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -112,6 +113,16 @@ void ANetPC::Server_SpawnAndPossess_Implementation()
 
 	Possess(newShip);
 
+	myShip = Cast<ANetPawn>(newShip);
+
+	if (!myShip)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::Server_SpawnAndPossess() CASTING to NetPawn FAILED | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+		return;
+	}
+
+	myShip->InitializeShip();
+
 	if (GetPawn())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ANetPC::Server_SpawnAndPossess() I HAVE A SHIP! OOOOOOOOOOOOO | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
@@ -126,4 +137,16 @@ void ANetPC::ReturnToMenu()
 {
 	UE_LOG(LogTemp, Error, TEXT("ANetPC::ReturnToMenu() | %s"), *GetName());
 	ClientTravel("MainMenu", ETravelType::TRAVEL_Absolute);
+}
+
+void ANetPC::AssignShipToPlayer()
+{
+	if (!GetPawn())
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::AssignShipToPlayer() Cannot GET Pawn! | Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
+		return;
+	}
+
+	myShip = Cast<ANetPawn>(GetPawn());
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::AssignShipToPlayer() GOT my ship | Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
 }

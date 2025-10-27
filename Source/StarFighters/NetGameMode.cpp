@@ -57,7 +57,9 @@ void ANetGameMode::PostLogin(APlayerController* NewPlayer)
 
 	Super::PostLogin(NewPlayer);
 
-	UE_LOG(LogTemp, Warning, TEXT("5-B) ANetGameMode::PostLogin() | PC Name: %s | PS Name: %s | ID: %i"), *NewPlayer->GetName(), *NewPlayer->PlayerState->GetPlayerName(), NewPlayer->PlayerState->GetPlayerId());
+	numberOfPlayers++;
+
+	UE_LOG(LogTemp, Warning, TEXT("5-B) ANetGameMode::PostLogin() | PC Name: %s | PS Name: %s | ID: %i | # Players: %i"), *NewPlayer->GetName(), *NewPlayer->PlayerState->GetPlayerName(), NewPlayer->PlayerState->GetPlayerId(), numberOfPlayers);
 
 	// Send the Server Name to the new Client
 	ANetPC* newPC = Cast<ANetPC>(NewPlayer);
@@ -93,8 +95,10 @@ FString ANetGameMode::InitNewPlayer(APlayerController* NewPlayerController, cons
 
 void ANetGameMode::Logout(AController* Exiting)
 {
+	numberOfPlayers--;
+
 	APlayerController* exitingPlayer = Cast<APlayerController>(Exiting);
-	UE_LOG(LogTemp, Warning, TEXT("X) ANetGameMode::Logout() | PC Name: %s | PS Name: %s | ID: %i"), *exitingPlayer->GetName(), *exitingPlayer->PlayerState->GetPlayerName(), exitingPlayer->PlayerState->GetPlayerId());
+	UE_LOG(LogTemp, Warning, TEXT("X) ANetGameMode::Logout() | PC Name: %s | PS Name: %s | ID: %i | # Players: %i"), *exitingPlayer->GetName(), *exitingPlayer->PlayerState->GetPlayerName(), exitingPlayer->PlayerState->GetPlayerId(), numberOfPlayers);
 
 	Super::Logout(Exiting);
 }

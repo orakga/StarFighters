@@ -25,6 +25,8 @@ class STARFIGHTERS_API ANetGameMode : public AGameModeBase
 	virtual FString InitNewPlayer(APlayerController* NewPlayerController, const FUniqueNetIdRepl& UniqueId, const FString& Options, const FString& Portal) override;
 	virtual void Logout(AController* Exiting) override;
 
+private:
 	FString serverName = "<Server Name NOT Provided>";
+	int32 numberOfPlayers = 0;
 
 };
