@@ -24,14 +24,28 @@ public:
 	
 	virtual void SetupInputComponent() override;
 
+	void SetInputMappingContext(class UInputMappingContext* newIMC, FString newIMCmessage);
+
 	UPROPERTY(EditAnywhere)
 	class UInputMappingContext* IMC_Spectating;
+
+	UPROPERTY(EditAnywhere)
+	class UInputMappingContext* IMC_Playing;
 
 	UPROPERTY(EditAnywhere)
 	class UInputAction* IA_SpawnShip;
 
 	UPROPERTY(EditAnywhere)
 	class UInputAction* IA_ReturnToMenu;
+
+	UPROPERTY(EditAnywhere)
+	class UInputAction* IA_Move;
+
+	UPROPERTY(EditAnywhere)
+	class UInputAction* IA_Aim;
+
+	UPROPERTY(EditAnywhere)
+	class UInputAction* IA_Shoot;
 
 	void AssignShipToPlayer();
 
@@ -43,6 +57,10 @@ private:
 		void Server_SpawnAndPossess();
 
 	void ReturnToMenu();
+	void Move(const struct FInputActionInstance& Instance);
+	void Aim(const struct FInputActionInstance& Instance);
+	void Shoot();
+
 
 	class ANetGameMode* theGameMode;
 	class ANetPawn* myShip;

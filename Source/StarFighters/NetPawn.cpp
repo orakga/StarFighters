@@ -29,6 +29,8 @@ void ANetPawn::BeginPlay()
 
 void ANetPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
 	DOREPLIFETIME_CONDITION(ANetPawn, myShipID, COND_InitialOnly);
 	DOREPLIFETIME_CONDITION(ANetPawn, myShipName, COND_InitialOnly);
 	DOREPLIFETIME_CONDITION(ANetPawn, isShipInitialized, COND_InitialOnly);

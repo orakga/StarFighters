@@ -28,19 +28,7 @@ void ANetPC::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("ANetPC::BeginPlay() | PC Name: %s | NO PlayerState"), *GetName());
 	}
 
-	if (!HasAuthority())
-	{
-		UEnhancedInputLocalPlayerSubsystem* SFInputSystem = Cast<ULocalPlayer>(Player)->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
-
-		if (!IMC_Spectating)
-		{
-			UE_LOG(LogTemp, Error, TEXT("ANetPC::BeginPlay() IMC_Spectating in NULL | %s"), *GetName());
-			return;
-		}
-
-		SFInputSystem->AddMappingContext(IMC_Spectating, 1);
-		UE_LOG(LogTemp, Error, TEXT("ANetPC::BeginPlay() IMC Set to Spectating | %s"), *GetName());
-	}
+	SetInputMappingContext(IMC_Spectating, "SPECTATING");
 
 }
 
@@ -81,6 +69,31 @@ void ANetPC::SetupInputComponent()
 
 	SFInputComponent->BindAction(IA_SpawnShip, ETriggerEvent::Triggered, this, &ANetPC::SpawnShip);
 	SFInputComponent->BindAction(IA_ReturnToMenu, ETriggerEvent::Triggered, this, &ANetPC::ReturnToMenu);
+	SFInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ANetPC::Move);
+	SFInputComponent->BindAction(IA_Aim, ETriggerEvent::Triggered, this, &ANetPC::Aim);
+	SFInputComponent->BindAction(IA_Shoot, ETriggerEvent::Triggered, this, &ANetPC::Shoot);
+}
+
+void ANetPC::SetInputMappingContext(class UInputMappingContext* newIMC, FString newIMCmessage)
+{
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::SetInputMappingContext() This is Authority! | %s"), *GetName());
+		return;
+	}
+
+	UEnhancedInputLocalPlayerSubsystem* SFInputSystem = Cast<ULocalPlayer>(Player)->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+
+	if (!newIMC)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::SetInputMappingContext() newIMC is NULL | %s"), *GetName());
+		return;
+	}
+
+	int32 inputMappingPriority = 1;
+	SFInputSystem->AddMappingContext(newIMC, inputMappingPriority);
+	UE_LOG(LogTemp, Error, TEXT("ANetPC::SetInputMappingContext() IMC: %s | %s"), *newIMCmessage, *GetName());
+
 }
 
 void ANetPC::SpawnShip()
@@ -139,6 +152,29 @@ void ANetPC::ReturnToMenu()
 	ClientTravel("MainMenu", ETravelType::TRAVEL_Absolute);
 }
 
+void ANetPC::Move(const struct FInputActionInstance& Instance)
+{
+	struct FInputActionValue inputValue = Instance.GetValue();
+	FVector2D moveInputVector = inputValue.Get<FVector2D>();
+
+	UE_LOG(LogTemp, Display, TEXT("ANetPC::Move() X: %.2f / Y: %.2f (PID: %d)"), moveInputVector.X, moveInputVector.Y, PlayerState->GetPlayerId());
+}
+
+
+void ANetPC::Aim(const struct FInputActionInstance& Instance)
+{
+	struct FInputActionValue inputValue = Instance.GetValue();
+	FVector2D aimInputVector = inputValue.Get<FVector2D>();
+
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::Aim() X: %.2f / Y: %.2f (PID: %d)"), aimInputVector.X, aimInputVector.Y, PlayerState->GetPlayerId());
+}
+
+void ANetPC::Shoot()
+{
+	UE_LOG(LogTemp, Error, TEXT("ANetPC::Shoot() xxxxxxxxxxxxxxxxxxxxxxx | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+}
+
+
 void ANetPC::AssignShipToPlayer()
 {
 	if (!GetPawn())
@@ -149,4 +185,6 @@ void ANetPC::AssignShipToPlayer()
 
 	myShip = Cast<ANetPawn>(GetPawn());
 	UE_LOG(LogTemp, Warning, TEXT("ANetPC::AssignShipToPlayer() GOT my ship | Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
+
+	SetInputMappingContext(IMC_Playing, "PLAYING");
 }
