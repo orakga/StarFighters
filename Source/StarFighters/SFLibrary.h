@@ -14,6 +14,8 @@
 
 #define PlayerNameMaxLength 12
 
+#define UserInputUpdateFrequency 2 // will be set to 30 once implementation is complete
+
 /**
  * 
  */

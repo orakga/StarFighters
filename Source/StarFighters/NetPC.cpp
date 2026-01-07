@@ -48,6 +48,27 @@ void ANetPC::OnRep_PlayerState()
 
 }
 
+
+void ANetPC::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// TECH DEBT note: Below routine should only run when the player is controlling the ship
+
+	if (!HasAuthority())
+	{
+		timeLeftToSendInput -= DeltaTime;
+
+		if (timeLeftToSendInput <= 0)
+		{
+			Server_UpdateUserInput(moveInputVector, aimInputVector);
+
+			timeLeftToSendInput += timeBetweenInputUpdates;
+		}
+	}
+}
+
+
 void ANetPC::MessageToClient_Implementation(const FString& message)
 {
 	UE_LOG(LogTemp, Error, TEXT("ANetPC::MessageToClient() | %s"), *message);
@@ -146,6 +167,11 @@ void ANetPC::Server_SpawnAndPossess_Implementation()
 	}
 }
 
+void ANetPC::Server_UpdateUserInput_Implementation(FVector2D moveInput, FVector2D aimInput)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::Server_UpdateUserInput() Move: %.2f / %.2f | Aim: %.2f / %.2f | %s (PID: %d)"), moveInput.X, moveInput.Y, aimInput.X, aimInput.Y, *GetName(), PlayerState->GetPlayerId());
+}
+
 void ANetPC::ReturnToMenu()
 {
 	UE_LOG(LogTemp, Error, TEXT("ANetPC::ReturnToMenu() | %s"), *GetName());
@@ -155,7 +181,7 @@ void ANetPC::ReturnToMenu()
 void ANetPC::Move(const struct FInputActionInstance& Instance)
 {
 	struct FInputActionValue inputValue = Instance.GetValue();
-	FVector2D moveInputVector = inputValue.Get<FVector2D>();
+	moveInputVector = inputValue.Get<FVector2D>();
 
 	UE_LOG(LogTemp, Display, TEXT("ANetPC::Move() X: %.2f / Y: %.2f (PID: %d)"), moveInputVector.X, moveInputVector.Y, PlayerState->GetPlayerId());
 }
@@ -164,7 +190,7 @@ void ANetPC::Move(const struct FInputActionInstance& Instance)
 void ANetPC::Aim(const struct FInputActionInstance& Instance)
 {
 	struct FInputActionValue inputValue = Instance.GetValue();
-	FVector2D aimInputVector = inputValue.Get<FVector2D>();
+	aimInputVector = inputValue.Get<FVector2D>();
 
 	UE_LOG(LogTemp, Warning, TEXT("ANetPC::Aim() X: %.2f / Y: %.2f (PID: %d)"), aimInputVector.X, aimInputVector.Y, PlayerState->GetPlayerId());
 }

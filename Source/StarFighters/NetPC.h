@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "SFLibrary.h"
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "NetPC.generated.h"
@@ -16,6 +17,7 @@ class STARFIGHTERS_API ANetPC : public APlayerController
 
 	virtual void BeginPlay() override;
 	virtual void OnRep_PlayerState() override;
+	virtual void Tick(float DeltaTime) override;
 
 public:
 
@@ -56,6 +58,9 @@ private:
 	UFUNCTION(reliable, Server)
 		void Server_SpawnAndPossess();
 
+	UFUNCTION(unreliable, server)
+		void Server_UpdateUserInput(FVector2D moveInput, FVector2D aimInput);
+
 	void ReturnToMenu();
 	void Move(const struct FInputActionInstance& Instance);
 	void Aim(const struct FInputActionInstance& Instance);
@@ -64,4 +69,10 @@ private:
 
 	class ANetGameMode* theGameMode;
 	class ANetPawn* myShip;
+
+	float timeBetweenInputUpdates = (float) 1 / (float) UserInputUpdateFrequency;
+	float timeLeftToSendInput = 0;
+
+	FVector2D moveInputVector;
+	FVector2D aimInputVector;
 };
