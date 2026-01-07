@@ -68,7 +68,8 @@ private:
 
 
 	class ANetGameMode* theGameMode;
-	class ANetPawn* myShip;
+	// class ANetPawn* myShip;
+	TWeakObjectPtr<class ANetPawn> myShip;
 
 	float timeBetweenInputUpdates = (float) 1 / (float) UserInputUpdateFrequency;
 	float timeLeftToSendInput = 0;

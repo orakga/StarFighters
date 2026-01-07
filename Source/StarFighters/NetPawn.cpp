@@ -25,6 +25,8 @@ void ANetPawn::BeginPlay()
 		SetLabel(myShipID, myShipName);
 	}
 
+	rootComp = (UPrimitiveComponent*)(this->GetRootComponent());
+
 }
 
 void ANetPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -66,6 +68,17 @@ void ANetPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (HasAuthority())
+	{
+		FVector accelVector = FVector(moveInputVector.Y, moveInputVector.X, 0);
+
+		rootComp->AddForce(accelVector, NAME_None, true);
+
+		Multicast_BroadcastState(rootComp->GetComponentLocation(), rootComp->GetComponentRotation());
+	}
+
+	FVector currentLocation = rootComp->GetComponentLocation();
+	UE_LOG(LogTemp, Error, TEXT("ANetPawn::Tick() Position X: %.2f / Y: %.2f / Z: %.2f | %s | %d"), currentLocation.X, currentLocation.Y, currentLocation.Z, *myShipName, myShipID);
 }
 
 // Called to bind functionality to input
@@ -97,4 +110,28 @@ void ANetPawn::InitializeShip()
 
 	UE_LOG(LogTemp, Warning, TEXT("ANetPawn::InitializeShip() myShipID = %d | myShipName = %s | %s"), myShipID, *myShipName, *GetDebugName(this));
 
+}
+
+void ANetPawn::SetUserInput(FVector2D moveInput, FVector2D aimInput)
+{
+	moveInputVector = moveInput;
+	aimInputVector = aimInput;
+
+	UE_LOG(LogTemp, Display, TEXT("ANetPawn::SetUserInput() Move: %.2f / %.2f | Aim: %.2f / %.2f | %s (PID: %d)"), moveInput.X, moveInput.Y, aimInput.X, aimInput.Y, *GetName(), myShipID);
+}
+
+void ANetPawn::Multicast_BroadcastState_Implementation(FVector shipPosition, FRotator shipRotation)
+{
+	if (HasAuthority())
+	{
+		return;
+	}
+
+	if (!rootComp)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::Multicast_BroadcastState() rootComp NOT initalized | ID: % i | % s"), myShipID, *GetDebugName(this));
+		return;
+	}
+
+	rootComp->SetWorldLocationAndRotation(shipPosition, shipRotation);
 }

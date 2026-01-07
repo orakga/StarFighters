@@ -31,6 +31,7 @@ public:
 		void SetLabel(int32 shipID, const FString& shipName);
 
 	void InitializeShip();
+	void SetUserInput(FVector2D moveInput, FVector2D aimInput);
 
 private:
 
@@ -51,5 +52,13 @@ private:
 	
 	UFUNCTION()
 		void OnRep_ShipInitialized();
+
+	UFUNCTION(unreliable, NetMulticast)
+		void Multicast_BroadcastState(FVector shipPosition, FRotator shipRotation);
+
+	FVector2D moveInputVector;
+	FVector2D aimInputVector;
+
+	UPrimitiveComponent* rootComp;
 
 };

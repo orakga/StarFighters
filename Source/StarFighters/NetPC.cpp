@@ -149,7 +149,7 @@ void ANetPC::Server_SpawnAndPossess_Implementation()
 
 	myShip = Cast<ANetPawn>(newShip);
 
-	if (!myShip)
+	if (!myShip.IsValid())
 	{
 		UE_LOG(LogTemp, Error, TEXT("ANetPC::Server_SpawnAndPossess() CASTING to NetPawn FAILED | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
 		return;
@@ -169,7 +169,15 @@ void ANetPC::Server_SpawnAndPossess_Implementation()
 
 void ANetPC::Server_UpdateUserInput_Implementation(FVector2D moveInput, FVector2D aimInput)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ANetPC::Server_UpdateUserInput() Move: %.2f / %.2f | Aim: %.2f / %.2f | %s (PID: %d)"), moveInput.X, moveInput.Y, aimInput.X, aimInput.Y, *GetName(), PlayerState->GetPlayerId());
+	UE_LOG(LogTemp, Display, TEXT("ANetPC::Server_UpdateUserInput() Move: %.2f / %.2f | Aim: %.2f / %.2f | %s (PID: %d)"), moveInput.X, moveInput.Y, aimInput.X, aimInput.Y, *GetName(), PlayerState->GetPlayerId());
+
+	if (!myShip.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::Server_UpdateUserInput() myShip is NOT VALID | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+		return;
+	}
+
+	myShip->SetUserInput(moveInput, aimInput);
 }
 
 void ANetPC::ReturnToMenu()
@@ -192,7 +200,7 @@ void ANetPC::Aim(const struct FInputActionInstance& Instance)
 	struct FInputActionValue inputValue = Instance.GetValue();
 	aimInputVector = inputValue.Get<FVector2D>();
 
-	UE_LOG(LogTemp, Warning, TEXT("ANetPC::Aim() X: %.2f / Y: %.2f (PID: %d)"), aimInputVector.X, aimInputVector.Y, PlayerState->GetPlayerId());
+	UE_LOG(LogTemp, Display, TEXT("ANetPC::Aim() X: %.2f / Y: %.2f (PID: %d)"), aimInputVector.X, aimInputVector.Y, PlayerState->GetPlayerId());
 }
 
 void ANetPC::Shoot()
