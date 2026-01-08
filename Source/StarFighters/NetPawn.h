@@ -55,7 +55,13 @@ private:
 		void OnRep_ShipInitialized();
 
 	UFUNCTION(unreliable, NetMulticast)
-		void Multicast_BroadcastState(FVector shipPositio, FVector shipVelocity, FRotator shipRotation);
+		void Multicast_BroadcastState(FVector shipPosition, FVector shipVelocity, float shipHeading);
+
+	void Move(float DeltaTime);
+	void Aim(float DeltaTime);
+	float GetCurrentHeading();
+	void SetHeading(float headingToSet);
+	void BroadcastState(float DeltaTime);
 
 	FVector2D moveInputVector;
 	FVector2D aimInputVector;
@@ -63,6 +69,8 @@ private:
 	UPrimitiveComponent* rootComp;
 
 	float shipAcceleration = 10000;
+	float shipTurnSpeed = 180;
+	float currentHeading;
 
 	float timeLeftToSendState = 0;
 	float timeBetweenStateUpdates = (float)1 / (float)ShipStateUpdateFrequency;

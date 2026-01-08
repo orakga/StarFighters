@@ -69,30 +69,19 @@ void ANetPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	currentHeading = GetCurrentHeading();
+
 	if (HasAuthority())
 	{
-		FVector accelVector = FVector(moveInputVector.Y, moveInputVector.X, 0);
+		Move(DeltaTime);
 
-		if (accelVector.Size() > 1)
-		{
-			accelVector.Normalize(); // limits Vector magnitude to 1.0
-		}
+		Aim(DeltaTime);
 
-
-		rootComp->AddForce(accelVector * DeltaTime * shipAcceleration, NAME_None, true);
-
-		timeLeftToSendState -= DeltaTime;
-
-		if (timeLeftToSendState <= 0)
-		{
-			Multicast_BroadcastState(rootComp->GetComponentLocation(), rootComp->GetPhysicsLinearVelocity(), rootComp->GetComponentRotation());
-			
-			timeLeftToSendState += timeBetweenStateUpdates;
-		}
-
+		BroadcastState(DeltaTime);
 	}
 
-	FVector currentLocation = rootComp->GetComponentLocation();
+	// ### [for DEBUG] logging out the ship's current location
+	// FVector currentLocation = rootComp->GetComponentLocation();
 	// UE_LOG(LogTemp, Display, TEXT("ANetPawn::Tick() Position X: %.2f / Y: %.2f / Z: %.2f | %s | %d"), currentLocation.X, currentLocation.Y, currentLocation.Z, *myShipName, myShipID);
 }
 
@@ -132,10 +121,10 @@ void ANetPawn::SetUserInput(FVector2D moveInput, FVector2D aimInput)
 	moveInputVector = moveInput;
 	aimInputVector = aimInput;
 
-	UE_LOG(LogTemp, Display, TEXT("ANetPawn::SetUserInput() Move: %.2f / %.2f | Aim: %.2f / %.2f | %s (PID: %d)"), moveInput.X, moveInput.Y, aimInput.X, aimInput.Y, *GetName(), myShipID);
+	// UE_LOG(LogTemp, Display, TEXT("ANetPawn::SetUserInput() Move: %.2f / %.2f | Aim: %.2f / %.2f | %s (PID: %d)"), moveInput.X, moveInput.Y, aimInput.X, aimInput.Y, *GetName(), myShipID);
 }
 
-void ANetPawn::Multicast_BroadcastState_Implementation(FVector shipPosition, FVector shipVelocity, FRotator shipRotation)
+void ANetPawn::Multicast_BroadcastState_Implementation(FVector shipPosition, FVector shipVelocity, float shipHeading)
 {
 	if (HasAuthority())
 	{
@@ -148,6 +137,71 @@ void ANetPawn::Multicast_BroadcastState_Implementation(FVector shipPosition, FVe
 		return;
 	}
 
-	rootComp->SetWorldLocationAndRotation(shipPosition, shipRotation);
+	// rootComp->SetWorldLocationAndRotation(shipPosition, shipRotation);
+	rootComp->SetWorldLocation(shipPosition);
+	SetHeading(shipHeading);
+
 	rootComp->SetPhysicsLinearVelocity(shipVelocity);
+}
+
+void ANetPawn::Move(float DeltaTime)
+{
+	FVector accelVector = FVector(moveInputVector.Y, moveInputVector.X, 0);
+
+	if (accelVector.Size() > 1)
+	{
+		accelVector.Normalize(); // limits Vector magnitude to 1.0
+	}
+
+	rootComp->AddForce(accelVector * DeltaTime * shipAcceleration, NAME_None, true);
+}
+
+
+void ANetPawn::Aim(float DeltaTime)
+{
+	// ADD or SUBTRACT to currentHeading, then
+	float newHeading = currentHeading + aimInputVector.X * DeltaTime * shipTurnSpeed;
+
+	// call SetHeading() with the desired heading
+	SetHeading(newHeading);
+}
+
+
+float ANetPawn::GetCurrentHeading()
+{
+	FRotator currentRotation = rootComp->GetComponentRotation();
+	FVector currentRotationDegrees = currentRotation.Euler();
+
+	UE_LOG(LogTemp, Warning, TEXT("ANetPawn::GetCurrentHeading() %0.2f"), currentRotationDegrees.Z);
+
+	return currentRotationDegrees.Z;
+}
+
+
+void ANetPawn::SetHeading(float headingToSet)
+{
+	if (currentHeading == headingToSet)
+	{
+		return;
+	}
+
+	FVector headingToRotationDegrees = FVector(0, 0, headingToSet);
+	FRotator rotationToSet = FRotator::MakeFromEuler(headingToRotationDegrees);
+
+	rootComp->SetWorldRotation(rotationToSet);
+
+	rootComp->SetPhysicsAngularVelocityInDegrees(FVector(0, 0, 0), false, NAME_None);
+}
+
+
+void ANetPawn::BroadcastState(float DeltaTime)
+{
+	timeLeftToSendState -= DeltaTime;
+
+	if (timeLeftToSendState <= 0)
+	{
+		Multicast_BroadcastState(rootComp->GetComponentLocation(), rootComp->GetPhysicsLinearVelocity(), currentHeading);
+
+		timeLeftToSendState += timeBetweenStateUpdates;
+	}
 }
