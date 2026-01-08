@@ -26,7 +26,8 @@ void ANetPawn::BeginPlay()
 	}
 
 	rootComp = (UPrimitiveComponent*)(this->GetRootComponent());
-
+	rootComp->SetLinearDamping(ShipLinearDamping);
+	rootComp->SetAngularDamping(ShipAngularDamping);
 }
 
 void ANetPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -72,13 +73,27 @@ void ANetPawn::Tick(float DeltaTime)
 	{
 		FVector accelVector = FVector(moveInputVector.Y, moveInputVector.X, 0);
 
-		rootComp->AddForce(accelVector, NAME_None, true);
+		if (accelVector.Size() > 1)
+		{
+			accelVector.Normalize(); // limits Vector magnitude to 1.0
+		}
 
-		Multicast_BroadcastState(rootComp->GetComponentLocation(), rootComp->GetComponentRotation());
+
+		rootComp->AddForce(accelVector * DeltaTime * shipAcceleration, NAME_None, true);
+
+		timeLeftToSendState -= DeltaTime;
+
+		if (timeLeftToSendState <= 0)
+		{
+			Multicast_BroadcastState(rootComp->GetComponentLocation(), rootComp->GetPhysicsLinearVelocity(), rootComp->GetComponentRotation());
+			
+			timeLeftToSendState += timeBetweenStateUpdates;
+		}
+
 	}
 
 	FVector currentLocation = rootComp->GetComponentLocation();
-	UE_LOG(LogTemp, Error, TEXT("ANetPawn::Tick() Position X: %.2f / Y: %.2f / Z: %.2f | %s | %d"), currentLocation.X, currentLocation.Y, currentLocation.Z, *myShipName, myShipID);
+	// UE_LOG(LogTemp, Display, TEXT("ANetPawn::Tick() Position X: %.2f / Y: %.2f / Z: %.2f | %s | %d"), currentLocation.X, currentLocation.Y, currentLocation.Z, *myShipName, myShipID);
 }
 
 // Called to bind functionality to input
@@ -120,7 +135,7 @@ void ANetPawn::SetUserInput(FVector2D moveInput, FVector2D aimInput)
 	UE_LOG(LogTemp, Display, TEXT("ANetPawn::SetUserInput() Move: %.2f / %.2f | Aim: %.2f / %.2f | %s (PID: %d)"), moveInput.X, moveInput.Y, aimInput.X, aimInput.Y, *GetName(), myShipID);
 }
 
-void ANetPawn::Multicast_BroadcastState_Implementation(FVector shipPosition, FRotator shipRotation)
+void ANetPawn::Multicast_BroadcastState_Implementation(FVector shipPosition, FVector shipVelocity, FRotator shipRotation)
 {
 	if (HasAuthority())
 	{
@@ -134,4 +149,5 @@ void ANetPawn::Multicast_BroadcastState_Implementation(FVector shipPosition, FRo
 	}
 
 	rootComp->SetWorldLocationAndRotation(shipPosition, shipRotation);
+	rootComp->SetPhysicsLinearVelocity(shipVelocity);
 }

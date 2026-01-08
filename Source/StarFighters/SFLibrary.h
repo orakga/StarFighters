@@ -14,7 +14,11 @@
 
 #define PlayerNameMaxLength 12
 
-#define UserInputUpdateFrequency 2 // will be set to 30 once implementation is complete
+#define UserInputUpdateFrequency 30
+#define ShipStateUpdateFrequency 10
+
+#define ShipLinearDamping 0.5
+#define ShipAngularDamping 0.5
 
 /**
  * 

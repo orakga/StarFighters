@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "SFLibrary.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "NetPawn.generated.h"
@@ -54,11 +55,16 @@ private:
 		void OnRep_ShipInitialized();
 
 	UFUNCTION(unreliable, NetMulticast)
-		void Multicast_BroadcastState(FVector shipPosition, FRotator shipRotation);
+		void Multicast_BroadcastState(FVector shipPositio, FVector shipVelocity, FRotator shipRotation);
 
 	FVector2D moveInputVector;
 	FVector2D aimInputVector;
 
 	UPrimitiveComponent* rootComp;
+
+	float shipAcceleration = 10000;
+
+	float timeLeftToSendState = 0;
+	float timeBetweenStateUpdates = (float)1 / (float)ShipStateUpdateFrequency;
 
 };
