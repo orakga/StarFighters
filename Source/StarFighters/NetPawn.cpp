@@ -79,6 +79,10 @@ void ANetPawn::Tick(float DeltaTime)
 
 		BroadcastState(DeltaTime);
 	}
+	else
+	{
+		TurnShipTowardTargetHeading(DeltaTime);
+	}
 
 	// ### [for DEBUG] logging out the ship's current location
 	// FVector currentLocation = rootComp->GetComponentLocation();
@@ -139,7 +143,9 @@ void ANetPawn::Multicast_BroadcastState_Implementation(FVector shipPosition, FVe
 
 	// rootComp->SetWorldLocationAndRotation(shipPosition, shipRotation);
 	rootComp->SetWorldLocation(shipPosition);
-	SetHeading(shipHeading);
+	
+	// SetHeading(shipHeading);
+	targetHeading = shipHeading;
 
 	rootComp->SetPhysicsLinearVelocity(shipVelocity);
 }
@@ -172,7 +178,7 @@ float ANetPawn::GetCurrentHeading()
 	FRotator currentRotation = rootComp->GetComponentRotation();
 	FVector currentRotationDegrees = currentRotation.Euler();
 
-	UE_LOG(LogTemp, Warning, TEXT("ANetPawn::GetCurrentHeading() %0.2f"), currentRotationDegrees.Z);
+	// UE_LOG(LogTemp, Display, TEXT("ANetPawn::GetCurrentHeading() %0.2f"), currentRotationDegrees.Z);
 
 	return currentRotationDegrees.Z;
 }
@@ -204,4 +210,36 @@ void ANetPawn::BroadcastState(float DeltaTime)
 
 		timeLeftToSendState += timeBetweenStateUpdates;
 	}
+}
+
+
+void ANetPawn::TurnShipTowardTargetHeading(float DeltaTime)
+{
+	if (currentHeading == targetHeading)  // Do not run this code if the ship is already facing the targetHeading
+	{
+		return;
+	}
+
+	float turnAngle = targetHeading - currentHeading; // how much the ship has left to turn to face its target heading
+
+	// keep turnAngle between -180 ~ +180
+	if (turnAngle > 180) turnAngle -= 360;
+	if (turnAngle < -180) turnAngle += 360;
+
+	float maxTurnAngleThisFrame = shipTurnSpeed * DeltaTime; // how much the ship is able to turn during THIS tick
+
+	float newHeadingForThisTick; // where the ship should face at the end of THIS tick
+
+	if (maxTurnAngleThisFrame >= FMath::Abs(turnAngle)) // if the ship can turn toward its TARGET heading during this Tick
+	{
+		newHeadingForThisTick = targetHeading;
+	}
+	else // if the ship can NOT turn all the way toward targetHeading during this tick, just turn it as far as possible
+	{
+		newHeadingForThisTick = currentHeading + maxTurnAngleThisFrame * FMath::Sign(turnAngle);
+	}
+
+	SetHeading(newHeadingForThisTick);
+
+	// UE_LOG(LogTemp, Warning, TEXT("ANetPawn::TurnShipTowardTargetHeading() Current: %0.2f | Target: %0.2f | New: %0.2f | TurnAngle: %0.2f"), currentHeading, targetHeading, newHeadingForThisTick, turnAngle);
 }

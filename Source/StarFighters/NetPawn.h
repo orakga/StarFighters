@@ -62,6 +62,7 @@ private:
 	float GetCurrentHeading();
 	void SetHeading(float headingToSet);
 	void BroadcastState(float DeltaTime);
+	void TurnShipTowardTargetHeading(float DeltaTime);
 
 	FVector2D moveInputVector;
 	FVector2D aimInputVector;
@@ -71,6 +72,7 @@ private:
 	float shipAcceleration = 10000;
 	float shipTurnSpeed = 180;
 	float currentHeading;
+	float targetHeading = 0;
 
 	float timeLeftToSendState = 0;
 	float timeBetweenStateUpdates = (float)1 / (float)ShipStateUpdateFrequency;

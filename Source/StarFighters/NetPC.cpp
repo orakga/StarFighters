@@ -173,7 +173,7 @@ void ANetPC::Server_UpdateUserInput_Implementation(FVector2D moveInput, FVector2
 
 	if (!myShip.IsValid())
 	{
-		UE_LOG(LogTemp, Error, TEXT("ANetPC::Server_UpdateUserInput() myShip is NOT VALID | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+		// UE_LOG(LogTemp, Error, TEXT("ANetPC::Server_UpdateUserInput() myShip is NOT VALID | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
 		return;
 	}
 
@@ -191,6 +191,11 @@ void ANetPC::Move(const struct FInputActionInstance& Instance)
 	struct FInputActionValue inputValue = Instance.GetValue();
 	moveInputVector = inputValue.Get<FVector2D>();
 
+	if (moveInputVector.Size() < 0.2)
+	{
+		moveInputVector = FVector2D(0, 0);
+	}
+
 	// UE_LOG(LogTemp, Display, TEXT("ANetPC::Move() X: %.2f / Y: %.2f (PID: %d)"), moveInputVector.X, moveInputVector.Y, PlayerState->GetPlayerId());
 }
 
@@ -199,6 +204,11 @@ void ANetPC::Aim(const struct FInputActionInstance& Instance)
 {
 	struct FInputActionValue inputValue = Instance.GetValue();
 	aimInputVector = inputValue.Get<FVector2D>();
+
+	if (aimInputVector.Size() < 0.2)
+	{
+		aimInputVector = FVector2D(0, 0);
+	}
 
 	// UE_LOG(LogTemp, Display, TEXT("ANetPC::Aim() X: %.2f / Y: %.2f (PID: %d)"), aimInputVector.X, aimInputVector.Y, PlayerState->GetPlayerId());
 }
