@@ -4,11 +4,18 @@
 #include "NetPC.h"
 #include "NetGameMode.h"
 #include "NetPawn.h"
+#include "GameCamera.h"
 #include "GameFramework/PlayerState.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
+
+
+ANetPC::ANetPC()
+{
+	bAutoManageActiveCameraTarget = false;
+}
 
 
 void ANetPC::BeginPlay()
@@ -29,6 +36,12 @@ void ANetPC::BeginPlay()
 	}
 
 	SetInputMappingContext(IMC_Spectating, "SPECTATING");
+
+	if (!HasAuthority())
+	{
+		myCamera = this->GetWorld()->SpawnActor<AGameCamera>(camera_Template, FixedCameraLocation, FixedCameraRotation, FActorSpawnParameters());
+		SetViewTarget(myCamera);
+	}
 
 }
 
@@ -228,7 +241,15 @@ void ANetPC::AssignShipToPlayer()
 	}
 
 	myShip = Cast<ANetPawn>(GetPawn());
+
+	if (!myShip.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::AssignShipToPlayer() FAILED TO GET SHIP | Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("ANetPC::AssignShipToPlayer() GOT my ship | Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
 
+	myCamera->SetTarget(myShip.Get());
 	SetInputMappingContext(IMC_Playing, "PLAYING");
 }

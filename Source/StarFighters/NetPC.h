@@ -15,6 +15,7 @@ class STARFIGHTERS_API ANetPC : public APlayerController
 {
 	GENERATED_BODY()
 
+	ANetPC();
 	virtual void BeginPlay() override;
 	virtual void OnRep_PlayerState() override;
 	virtual void Tick(float DeltaTime) override;
@@ -49,6 +50,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInputAction* IA_Shoot;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AGameCamera> camera_Template;
+
 	void AssignShipToPlayer();
 
 private:
@@ -70,6 +74,7 @@ private:
 	class ANetGameMode* theGameMode;
 	// class ANetPawn* myShip;
 	TWeakObjectPtr<class ANetPawn> myShip;
+	class AGameCamera* myCamera;
 
 	float timeBetweenInputUpdates = (float) 1 / (float) UserInputUpdateFrequency;
 	float timeLeftToSendInput = 0;

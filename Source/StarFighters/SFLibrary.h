@@ -20,6 +20,9 @@
 #define ShipLinearDamping 0.5
 #define ShipAngularDamping 0.5
 
+#define FixedCameraLocation FVector(-1000, 0, 1200)
+#define FixedCameraRotation FRotator(-45, 0, 0)
+
 /**
  * 
  */
@@ -30,5 +33,5 @@ public:
 	~SFLibrary();
 
 	// static FString TestFunc() { return FString("SF Library is WORKING!!"); }
-	// Called as SFLibrary::TestFunc()
+	// Called as SFLibrary::TestFunc()r
 };
