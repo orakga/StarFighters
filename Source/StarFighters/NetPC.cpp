@@ -229,7 +229,22 @@ void ANetPC::Aim(const struct FInputActionInstance& Instance)
 void ANetPC::Shoot()
 {
 	UE_LOG(LogTemp, Error, TEXT("ANetPC::Shoot() xxxxxxxxxxxxxxxxxxxxxxx | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+
+	Server_Shoot();
 }
+
+
+void ANetPC::Server_Shoot_Implementation()
+{
+	if (!myShip.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::Server_Shoot() myShip is NOT VALID | Player Name: %s (PID: %d)"), *PlayerState->GetPlayerName(), PlayerState->GetPlayerId());
+		return;
+	}
+
+	myShip->Shoot();
+}
+
 
 
 void ANetPC::AssignShipToPlayer()

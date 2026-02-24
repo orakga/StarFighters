@@ -34,6 +34,11 @@ public:
 	void InitializeShip();
 	void SetUserInput(FVector2D moveInput, FVector2D aimInput);
 
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ANetProjectile> projectileTemplate;
+
+	void Shoot();
+
 private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_ShipID)

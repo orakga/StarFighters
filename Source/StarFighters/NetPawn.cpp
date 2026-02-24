@@ -3,6 +3,7 @@
 
 #include "NetPawn.h"
 #include "NetPC.h"
+#include "NetProjectile.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
 
@@ -127,6 +128,25 @@ void ANetPawn::SetUserInput(FVector2D moveInput, FVector2D aimInput)
 
 	// UE_LOG(LogTemp, Display, TEXT("ANetPawn::SetUserInput() Move: %.2f / %.2f | Aim: %.2f / %.2f | %s (PID: %d)"), moveInput.X, moveInput.Y, aimInput.X, aimInput.Y, *GetName(), myShipID);
 }
+
+
+void ANetPawn::Shoot()
+{
+	if (!HasAuthority())
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::Shoot() Has to run AT SERVER | ID: % i | % s"), myShipID, *GetDebugName(this));
+		return;
+	}
+
+	if (!projectileTemplate)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::Shoot() Projectile TEMPLATE is NOT VALID | ID: % i | % s"), myShipID, *GetDebugName(this));
+		return;
+	}
+
+	this->GetWorld()->SpawnActor<ANetProjectile>(projectileTemplate, rootComp->GetComponentLocation() + this->GetActorForwardVector() * ProjectileSpawnOffset, rootComp->GetComponentRotation(), FActorSpawnParameters());
+}
+
 
 void ANetPawn::Multicast_BroadcastState_Implementation(FVector shipPosition, FVector shipVelocity, float shipHeading)
 {

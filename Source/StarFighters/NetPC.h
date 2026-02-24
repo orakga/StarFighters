@@ -70,6 +70,8 @@ private:
 	void Aim(const struct FInputActionInstance& Instance);
 	void Shoot();
 
+	UFUNCTION(reliable, server)
+		void Server_Shoot();
 
 	class ANetGameMode* theGameMode;
 	// class ANetPawn* myShip;
