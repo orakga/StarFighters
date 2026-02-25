@@ -16,12 +16,16 @@ private:
 	ANetProjectile();
 
 	UPrimitiveComponent* rootComp;
+	UPrimitiveComponent* colliderComp;
 
 	float projectileSpeed = 50;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+		void OverlapDetected(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 public:	
 	// Called every frame

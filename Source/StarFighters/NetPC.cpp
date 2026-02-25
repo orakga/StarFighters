@@ -228,7 +228,7 @@ void ANetPC::Aim(const struct FInputActionInstance& Instance)
 
 void ANetPC::Shoot()
 {
-	UE_LOG(LogTemp, Error, TEXT("ANetPC::Shoot() xxxxxxxxxxxxxxxxxxxxxxx | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+	// UE_LOG(LogTemp, Error, TEXT("ANetPC::Shoot() xxxxxxxxxxxxxxxxxxxxxxx | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
 
 	Server_Shoot();
 }
