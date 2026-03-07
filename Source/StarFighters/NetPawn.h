@@ -39,6 +39,8 @@ public:
 
 	void Shoot();
 
+	int32 GetMyID() { return myShipID; }
+
 private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_ShipID)

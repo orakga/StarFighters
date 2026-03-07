@@ -15,10 +15,15 @@ private:
 	// Sets default values for this actor's properties
 	ANetProjectile();
 
+	void CheckForOutOfBounds();
+
 	UPrimitiveComponent* rootComp;
 	UPrimitiveComponent* colliderComp;
 
-	float projectileSpeed = 50;
+	float projectileSpeed = 300;
+
+	int32 myShooterID = -1;
+	bool projectileInitialized = false;
 
 protected:
 	// Called when the game starts or when spawned
@@ -27,10 +32,16 @@ protected:
 	UFUNCTION()
 		void OverlapDetected(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION(reliable, NetMulticast)
+		void BroadcastDamage();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	int32 GetMyShooterID() { return myShooterID; }
+	void SetProjectileParams(int32 shooterID);
+	bool IsInitalized() { return projectileInitialized;}
 	
-	
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class AActor> hitFX_template;
 };

@@ -9,7 +9,6 @@ void AStarGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	/*
 	for (int i = 0; i < StarfieldAreaQuantity; i++)
 	{
 		// ## SPAWN ONE STAR AT A TIME ##
@@ -24,5 +23,4 @@ void AStarGenerator::BeginPlay()
 			FActorSpawnParameters()
 		);
 	}
-	*/
 }

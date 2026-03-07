@@ -144,7 +144,8 @@ void ANetPawn::Shoot()
 		return;
 	}
 
-	this->GetWorld()->SpawnActor<ANetProjectile>(projectileTemplate, rootComp->GetComponentLocation() + this->GetActorForwardVector() * ProjectileSpawnOffset, rootComp->GetComponentRotation(), FActorSpawnParameters());
+	ANetProjectile* spawnedProjectile = this->GetWorld()->SpawnActor<ANetProjectile>(projectileTemplate, rootComp->GetComponentLocation() + this->GetActorForwardVector() * ProjectileSpawnOffset, rootComp->GetComponentRotation(), FActorSpawnParameters());
+	spawnedProjectile->SetProjectileParams(myShipID);
 }
 
 
