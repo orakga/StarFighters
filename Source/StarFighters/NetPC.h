@@ -63,7 +63,7 @@ private:
 		void Server_SpawnAndPossess();
 
 	UFUNCTION(unreliable, server)
-		void Server_UpdateUserInput(FVector2D moveInput, FVector2D aimInput);
+		void Server_UpdatePlayerInput(FPlayerInputState newPlayerInputState);
 
 	void ReturnToMenu();
 	void Move(const struct FInputActionInstance& Instance);
@@ -83,4 +83,5 @@ private:
 
 	FVector2D moveInputVector;
 	FVector2D aimInputVector;
+	FPlayerInputState playerInputState;
 };

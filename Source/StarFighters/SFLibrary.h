@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SFLibrary.generated.h"
 
 #define StarfieldAreaLeft -10000
 #define StarfieldAreaRight 10000
@@ -27,6 +28,31 @@
 #define ProjectileAreaWidth 10000
 #define ProjectileAreaHeight 10000
 
+#define MoveInputDeadzone 0.5
+#define AimInputDeadzone 0.5
+
+
+// STRUCTS ==========================================================
+
+USTRUCT(BlueprintType)
+struct FPlayerInputState
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	float moveHeading = 0.f;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool isMoveInputActive = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	float aimHeading = 0.f;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool isAimInputActive = false;
+};
+
+
 /**
  * 
  */
@@ -36,6 +62,5 @@ public:
 	SFLibrary();
 	~SFLibrary();
 
-	// static FString TestFunc() { return FString("SF Library is WORKING!!"); }
-	// Called as SFLibrary::TestFunc()r
+	static float BoundHeadingAngle(float inHeading);
 };

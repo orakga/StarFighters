@@ -32,7 +32,7 @@ public:
 		void SetLabel(int32 shipID, const FString& shipName);
 
 	void InitializeShip();
-	void SetUserInput(FVector2D moveInput, FVector2D aimInput);
+	void SetPlayerInput(FPlayerInputState newPlayerInputState);
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ANetProjectile> projectileTemplate;
@@ -71,8 +71,7 @@ private:
 	void BroadcastState(float DeltaTime);
 	void TurnShipTowardTargetHeading(float DeltaTime);
 
-	FVector2D moveInputVector;
-	FVector2D aimInputVector;
+	FPlayerInputState playerInputState;
 
 	UPrimitiveComponent* rootComp;
 

@@ -121,12 +121,13 @@ void ANetPawn::InitializeShip()
 
 }
 
-void ANetPawn::SetUserInput(FVector2D moveInput, FVector2D aimInput)
+void ANetPawn::SetPlayerInput(FPlayerInputState newPlayerInputState)
 {
-	moveInputVector = moveInput;
-	aimInputVector = aimInput;
 
-	// UE_LOG(LogTemp, Display, TEXT("ANetPawn::SetUserInput() Move: %.2f / %.2f | Aim: %.2f / %.2f | %s (PID: %d)"), moveInput.X, moveInput.Y, aimInput.X, aimInput.Y, *GetName(), myShipID);
+	playerInputState = newPlayerInputState;
+	targetHeading = playerInputState.aimHeading;
+
+	UE_LOG(LogTemp, Error, TEXT("ANetPawn::SetUserInput() Move: %.1f | Aim: %.1f | %s (PID: %d)"), playerInputState.moveHeading, playerInputState.aimHeading, *GetName(), myShipID);
 }
 
 
@@ -173,12 +174,14 @@ void ANetPawn::Multicast_BroadcastState_Implementation(FVector shipPosition, FVe
 
 void ANetPawn::Move(float DeltaTime)
 {
-	FVector accelVector = FVector(moveInputVector.Y, moveInputVector.X, 0);
-
-	if (accelVector.Size() > 1)
+	if (!playerInputState.isMoveInputActive)
 	{
-		accelVector.Normalize(); // limits Vector magnitude to 1.0
+		return;
 	}
+
+	// CONVERT HEADING to VECTOR
+	float headingRadians = FMath::DegreesToRadians(playerInputState.moveHeading);
+	FVector accelVector = FVector( FMath::Cos(headingRadians), FMath::Sin(headingRadians), 0);
 
 	rootComp->AddForce(accelVector * DeltaTime * shipAcceleration, NAME_None, true);
 }
@@ -186,11 +189,12 @@ void ANetPawn::Move(float DeltaTime)
 
 void ANetPawn::Aim(float DeltaTime)
 {
-	// ADD or SUBTRACT to currentHeading, then
-	float newHeading = currentHeading + aimInputVector.X * DeltaTime * shipTurnSpeed;
+	if (!playerInputState.isAimInputActive)
+	{
+		return;
+	}
 
-	// call SetHeading() with the desired heading
-	SetHeading(newHeading);
+	TurnShipTowardTargetHeading(DeltaTime);
 }
 
 

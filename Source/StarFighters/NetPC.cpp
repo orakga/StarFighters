@@ -74,7 +74,7 @@ void ANetPC::Tick(float DeltaTime)
 
 		if (timeLeftToSendInput <= 0)
 		{
-			Server_UpdateUserInput(moveInputVector, aimInputVector);
+			Server_UpdatePlayerInput(playerInputState);
 
 			timeLeftToSendInput += timeBetweenInputUpdates;
 		}
@@ -180,7 +180,7 @@ void ANetPC::Server_SpawnAndPossess_Implementation()
 	}
 }
 
-void ANetPC::Server_UpdateUserInput_Implementation(FVector2D moveInput, FVector2D aimInput)
+void ANetPC::Server_UpdatePlayerInput_Implementation(FPlayerInputState newPlayerInputState)
 {
 	// UE_LOG(LogTemp, Display, TEXT("ANetPC::Server_UpdateUserInput() Move: %.2f / %.2f | Aim: %.2f / %.2f | %s (PID: %d)"), moveInput.X, moveInput.Y, aimInput.X, aimInput.Y, *GetName(), PlayerState->GetPlayerId());
 
@@ -190,7 +190,7 @@ void ANetPC::Server_UpdateUserInput_Implementation(FVector2D moveInput, FVector2
 		return;
 	}
 
-	myShip->SetUserInput(moveInput, aimInput);
+	myShip->SetPlayerInput(newPlayerInputState);
 }
 
 void ANetPC::ReturnToMenu()
@@ -204,12 +204,21 @@ void ANetPC::Move(const struct FInputActionInstance& Instance)
 	struct FInputActionValue inputValue = Instance.GetValue();
 	moveInputVector = inputValue.Get<FVector2D>();
 
-	if (moveInputVector.Size() < 0.2)
+	if (moveInputVector.Size() < MoveInputDeadzone)
 	{
-		moveInputVector = FVector2D(0, 0);
+		playerInputState.isMoveInputActive = false;
+		// moveInputVector = FVector2D(0, 0);
+	}
+	else
+	{
+		playerInputState.isMoveInputActive = true;
+
+		// CALCULATE HEADING
+		float headingRadians = FMath::Atan2(moveInputVector.X, moveInputVector.Y);
+		playerInputState.moveHeading = SFLibrary::BoundHeadingAngle( FMath::RadiansToDegrees(headingRadians) );
 	}
 
-	// UE_LOG(LogTemp, Display, TEXT("ANetPC::Move() X: %.2f / Y: %.2f (PID: %d)"), moveInputVector.X, moveInputVector.Y, PlayerState->GetPlayerId());
+	UE_LOG(LogTemp, Error, TEXT("ANetPC::Move() X: %.2f / Y: %.2f | Heading: %.1f (PID: %d)"), moveInputVector.X, moveInputVector.Y, playerInputState.moveHeading, PlayerState->GetPlayerId());
 }
 
 
@@ -218,12 +227,21 @@ void ANetPC::Aim(const struct FInputActionInstance& Instance)
 	struct FInputActionValue inputValue = Instance.GetValue();
 	aimInputVector = inputValue.Get<FVector2D>();
 
-	if (aimInputVector.Size() < 0.2)
+	if (aimInputVector.Size() < AimInputDeadzone)
 	{
-		aimInputVector = FVector2D(0, 0);
+		playerInputState.isAimInputActive = false;
+		// aimInputVector = FVector2D(0, 0);
+	}
+	else
+	{
+		playerInputState.isAimInputActive = true;
+
+		// CALCULATE HEADING
+		float headingRadians = FMath::Atan2(aimInputVector.X, aimInputVector.Y);
+		playerInputState.aimHeading = SFLibrary::BoundHeadingAngle(FMath::RadiansToDegrees(headingRadians));
 	}
 
-	// UE_LOG(LogTemp, Display, TEXT("ANetPC::Aim() X: %.2f / Y: %.2f (PID: %d)"), aimInputVector.X, aimInputVector.Y, PlayerState->GetPlayerId());
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::Aim() X: %.2f / Y: %.2f | Heading: %.1f (PID: %d)"), aimInputVector.X, aimInputVector.Y, playerInputState.aimHeading, PlayerState->GetPlayerId());
 }
 
 void ANetPC::Shoot()
