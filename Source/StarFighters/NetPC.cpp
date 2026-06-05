@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
+#include "DrawDebugHelpers.h"
 
 
 ANetPC::ANetPC()
@@ -24,6 +25,7 @@ void ANetPC::BeginPlay()
 
 	bShowMouseCursor = true;
 
+	theWorld = GetWorld();
 	theGameMode = Cast<ANetGameMode>(UGameplayStatics::GetGameMode(this->GetWorld()));
 
 	if (PlayerState)
@@ -66,10 +68,10 @@ void ANetPC::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// TECH DEBT note: Below routine should only run when the player is controlling the ship
-
-	if (!HasAuthority())
+	if (!HasAuthority() && myShip.IsValid() )
 	{
+		DebugDisplay();
+
 		timeLeftToSendInput -= DeltaTime;
 
 		if (timeLeftToSendInput <= 0)
@@ -218,7 +220,7 @@ void ANetPC::Move(const struct FInputActionInstance& Instance)
 		playerInputState.moveHeading = SFLibrary::BoundHeadingAngle( FMath::RadiansToDegrees(headingRadians) );
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("ANetPC::Move() X: %.2f / Y: %.2f | Heading: %.1f (PID: %d)"), moveInputVector.X, moveInputVector.Y, playerInputState.moveHeading, PlayerState->GetPlayerId());
+	// UE_LOG(LogTemp, Error, TEXT("ANetPC::Move() X: %.2f / Y: %.2f | Heading: %.1f (PID: %d)"), moveInputVector.X, moveInputVector.Y, playerInputState.moveHeading, PlayerState->GetPlayerId());
 }
 
 
@@ -241,7 +243,7 @@ void ANetPC::Aim(const struct FInputActionInstance& Instance)
 		playerInputState.aimHeading = SFLibrary::BoundHeadingAngle(FMath::RadiansToDegrees(headingRadians));
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("ANetPC::Aim() X: %.2f / Y: %.2f | Heading: %.1f (PID: %d)"), aimInputVector.X, aimInputVector.Y, playerInputState.aimHeading, PlayerState->GetPlayerId());
+	// UE_LOG(LogTemp, Warning, TEXT("ANetPC::Aim() X: %.2f / Y: %.2f | Heading: %.1f (PID: %d)"), aimInputVector.X, aimInputVector.Y, playerInputState.aimHeading, PlayerState->GetPlayerId());
 }
 
 void ANetPC::Shoot()
@@ -285,4 +287,77 @@ void ANetPC::AssignShipToPlayer()
 
 	myCamera->SetTarget(myShip.Get());
 	SetInputMappingContext(IMC_Playing, "PLAYING");
+}
+
+
+void ANetPC::DebugDisplay()
+{
+	FVector shipLocation = myShip->GetActorLocation();
+
+	// Draw MOVE debugs ==============================================
+	if (playerInputState.isMoveInputActive)
+	{
+		float moveHeadingRad = FMath::DegreesToRadians(playerInputState.moveHeading);
+		FVector moveDir = FVector(FMath::Cos(moveHeadingRad), FMath::Sin(moveHeadingRad), 0);
+
+		// DRAW LINE ------------------------------
+		DrawDebugLine(
+			theWorld, // const UWorld * InWorld,
+			shipLocation, // const FVector & LineStart,
+			shipLocation + moveDir * 300, // const FVector & LineEnd,
+			FColor::Green, // const FColor & Color,
+			false, // bool bPersistentLines = false,
+			0.f, // float LifeTime = -1.f,
+			0, // uint8 DepthPriority = 0,
+			3 // float Thickness = 0.f
+		);
+
+
+		// DRAW TEXT ------------------------------
+		DrawDebugString(
+			theWorld, // const UWorld * InWorld,
+			shipLocation + FVector(0, -100, 0), // const FVector & TextLocation,
+			FString::Printf(TEXT("%.0f"), playerInputState.moveHeading), // const FString & Text,
+			nullptr, // AActor * TestBaseActor = nullptr,
+			FColor::Green, // const FColor & TextColor = FColor::White,
+			0, // float Duration = -1.0f,
+			true, // bool bDrawShadow = false,
+			1 // float FontScale = 1.f
+		);
+
+	}
+
+
+	// Draw AIM debugs ==============================================
+	if (playerInputState.isAimInputActive)
+	{
+		float aimHeadingRad = FMath::DegreesToRadians(playerInputState.aimHeading);
+		FVector aimDir = FVector(FMath::Cos(aimHeadingRad), FMath::Sin(aimHeadingRad), 0);
+
+		// DRAW LINE ------------------------------
+		DrawDebugLine(
+			theWorld, // const UWorld * InWorld,
+			shipLocation, // const FVector & LineStart,
+			shipLocation + aimDir * 300, // const FVector & LineEnd,
+			FColor::Red, // const FColor & Color,
+			false, // bool bPersistentLines = false,
+			0.f, // float LifeTime = -1.f,
+			0, // uint8 DepthPriority = 0,
+			3 // float Thickness = 0.f
+		);
+
+
+		// DRAW TEXT ------------------------------
+		DrawDebugString(
+			theWorld, // const UWorld * InWorld,
+			shipLocation + FVector(0, +100, 0), // const FVector & TextLocation,
+			FString::Printf(TEXT("%.0f"), playerInputState.aimHeading), // const FString & Text,
+			nullptr, // AActor * TestBaseActor = nullptr,
+			FColor::Red, // const FColor & TextColor = FColor::White,
+			0, // float Duration = -1.0f,
+			true, // bool bDrawShadow = false,
+			1 // float FontScale = 1.f
+		);
+
+	}
 }

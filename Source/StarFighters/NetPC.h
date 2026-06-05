@@ -70,9 +70,12 @@ private:
 	void Aim(const struct FInputActionInstance& Instance);
 	void Shoot();
 
+	void DebugDisplay();
+
 	UFUNCTION(reliable, server)
 		void Server_Shoot();
 
+	UWorld* theWorld;
 	class ANetGameMode* theGameMode;
 	// class ANetPawn* myShip;
 	TWeakObjectPtr<class ANetPawn> myShip;

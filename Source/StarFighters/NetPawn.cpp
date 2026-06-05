@@ -127,7 +127,7 @@ void ANetPawn::SetPlayerInput(FPlayerInputState newPlayerInputState)
 	playerInputState = newPlayerInputState;
 	targetHeading = playerInputState.aimHeading;
 
-	UE_LOG(LogTemp, Error, TEXT("ANetPawn::SetUserInput() Move: %.1f | Aim: %.1f | %s (PID: %d)"), playerInputState.moveHeading, playerInputState.aimHeading, *GetName(), myShipID);
+	// UE_LOG(LogTemp, Error, TEXT("ANetPawn::SetUserInput() Move: %.1f | Aim: %.1f | %s (PID: %d)"), playerInputState.moveHeading, playerInputState.aimHeading, *GetName(), myShipID);
 }
 
 
