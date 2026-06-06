@@ -51,6 +51,9 @@ public:
 	class UInputAction* IA_Shoot;
 
 	UPROPERTY(EditAnywhere)
+	class UInputAction* IA_MouseAim;
+
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AGameCamera> camera_Template;
 
 	void AssignShipToPlayer();
@@ -68,6 +71,7 @@ private:
 	void ReturnToMenu();
 	void Move(const struct FInputActionInstance& Instance);
 	void Aim(const struct FInputActionInstance& Instance);
+	void MouseAim(const struct FInputActionInstance& Instance);
 	void Shoot();
 
 	void DebugDisplay();
@@ -87,4 +91,6 @@ private:
 	FVector2D moveInputVector;
 	FVector2D aimInputVector;
 	FPlayerInputState playerInputState;
+	bool isMousePressed = false;
+	FVector mouseHitLocation;
 };

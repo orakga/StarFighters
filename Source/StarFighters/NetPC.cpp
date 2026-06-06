@@ -107,6 +107,7 @@ void ANetPC::SetupInputComponent()
 	SFInputComponent->BindAction(IA_ReturnToMenu, ETriggerEvent::Triggered, this, &ANetPC::ReturnToMenu);
 	SFInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ANetPC::Move);
 	SFInputComponent->BindAction(IA_Aim, ETriggerEvent::Triggered, this, &ANetPC::Aim);
+	SFInputComponent->BindAction(IA_MouseAim, ETriggerEvent::Triggered, this, &ANetPC::MouseAim);
 	SFInputComponent->BindAction(IA_Shoot, ETriggerEvent::Triggered, this, &ANetPC::Shoot);
 }
 
@@ -246,6 +247,34 @@ void ANetPC::Aim(const struct FInputActionInstance& Instance)
 	// UE_LOG(LogTemp, Warning, TEXT("ANetPC::Aim() X: %.2f / Y: %.2f | Heading: %.1f (PID: %d)"), aimInputVector.X, aimInputVector.Y, playerInputState.aimHeading, PlayerState->GetPlayerId());
 }
 
+void ANetPC::MouseAim(const struct FInputActionInstance& Instance)
+{
+	struct FInputActionValue inputValue = Instance.GetValue();
+	isMousePressed = inputValue.Get<bool>();
+
+	FHitResult hitResult;
+	GetHitResultUnderCursor(MouseAimTraceChannel, false, hitResult);
+
+	if (myShip.IsValid() && isMousePressed && hitResult.bBlockingHit)
+	{
+		playerInputState.isAimInputActive = true;
+	}
+	else
+	{
+		playerInputState.isAimInputActive = false;
+		return;
+	}
+
+	mouseHitLocation = hitResult.Location;
+	FVector shipLocation = myShip->GetActorLocation();
+	FVector mouseAimDirection = mouseHitLocation - shipLocation;
+
+	// CALCULATE HEADING
+	float headingRadians = FMath::Atan2(mouseAimDirection.Y, mouseAimDirection.X);
+	playerInputState.aimHeading = SFLibrary::BoundHeadingAngle(FMath::RadiansToDegrees(headingRadians));
+}
+	
+
 void ANetPC::Shoot()
 {
 	// UE_LOG(LogTemp, Error, TEXT("ANetPC::Shoot() xxxxxxxxxxxxxxxxxxxxxxx | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
@@ -358,6 +387,17 @@ void ANetPC::DebugDisplay()
 			true, // bool bDrawShadow = false,
 			1 // float FontScale = 1.f
 		);
+
+		if (isMousePressed)
+		{
+			FVector crossLeft = mouseHitLocation + FVector(-30, 0, 0);
+			FVector crossRight = mouseHitLocation + FVector(30, 0, 0);
+			FVector crossTop = mouseHitLocation + FVector(0, 30, 0);
+			FVector crossBottom = mouseHitLocation + FVector(0, -30, 0);
+
+			DrawDebugLine(theWorld, crossLeft, crossRight, FColor::Yellow, false, 0.f, 0, 5);
+			DrawDebugLine(theWorld, crossTop, crossBottom, FColor::Yellow, false, 0.f, 0, 5);
+		}
 
 	}
 }

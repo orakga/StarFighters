@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "SFLibrary.generated.h"
 
+#define MouseAimTraceChannel ECC_GameTraceChannel1
+
 #define StarfieldAreaLeft -10000
 #define StarfieldAreaRight 10000
 #define StarfieldAreaFront -10000
