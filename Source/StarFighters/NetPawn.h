@@ -37,6 +37,12 @@ public:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ANetProjectile> projectileTemplate;
 
+	UPROPERTY(EditAnywhere)
+		int32 startingHealth = 100;
+
+	UPROPERTY(EditAnywhere)
+		int32 startingMaxHealth = 100;
+
 	void Shoot();
 
 	int32 GetMyID() { return myShipID; }
@@ -74,6 +80,14 @@ private:
 	FPlayerInputState playerInputState;
 
 	UPrimitiveComponent* rootComp;
+
+	class USFGameplayAttributes* myGameplayAttributes;
+
+	UPROPERTY(Replicated)
+		int32 health = 0;
+
+	UPROPERTY(Replicated)
+		int32 maxHealth = 0;
 
 	float shipAcceleration = 10000;
 	float shipTurnSpeed = 180;

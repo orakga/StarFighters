@@ -22,6 +22,9 @@ private:
 
 	float projectileSpeed = 300;
 
+	UPROPERTY(EditAnywhere)
+		int32 projectileDamage = 10;
+
 	int32 myShooterID = -1;
 	bool projectileInitialized = false;
 

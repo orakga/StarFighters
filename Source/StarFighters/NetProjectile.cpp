@@ -3,6 +3,7 @@
 
 #include "NetProjectile.h"
 #include "NetPawn.h"
+#include "SFGameplayAttributes.h"
 
 
 // Sets default values
@@ -147,6 +148,19 @@ void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, 
 	if (isValidHit)
 	{
 		UE_LOG(LogTemp, Error, TEXT("ANetProjectile::OverlapDetected() VALID HIT | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
+		
+		USFGameplayAttributes* victimGameplayAttributes = OtherActor->FindComponentByClass<USFGameplayAttributes>();
+		if (victimGameplayAttributes)
+		{
+			// OtherActor can receive damage
+			victimGameplayAttributes->ProcessDamage(projectileDamage, myShooterID, this);
+		}
+		else
+		{
+			// OtherActor DOES NOT have a GameplayAttributes component
+			UE_LOG(LogTemp, Error, TEXT("ANetProjectile::OverlapDetected() NO GameplayAttributes on the Victim | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
+		}
+		
 		BroadcastDamage();
 		this->Destroy();
 	}

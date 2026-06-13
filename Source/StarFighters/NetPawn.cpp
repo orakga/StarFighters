@@ -4,6 +4,7 @@
 #include "NetPawn.h"
 #include "NetPC.h"
 #include "NetProjectile.h"
+#include "SFGameplayAttributes.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
 
@@ -29,6 +30,9 @@ void ANetPawn::BeginPlay()
 	rootComp = (UPrimitiveComponent*)(this->GetRootComponent());
 	rootComp->SetLinearDamping(ShipLinearDamping);
 	rootComp->SetAngularDamping(ShipAngularDamping);
+
+	myGameplayAttributes = FindComponentByClass<USFGameplayAttributes>();
+	if(!myGameplayAttributes) UE_LOG(LogTemp, Error, TEXT("ANetPawn::BeginPlay() could not find GameplayAttributes in components: CHECK BP | %s"), *GetDebugName(this));
 }
 
 void ANetPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -38,6 +42,8 @@ void ANetPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	DOREPLIFETIME_CONDITION(ANetPawn, myShipID, COND_InitialOnly);
 	DOREPLIFETIME_CONDITION(ANetPawn, myShipName, COND_InitialOnly);
 	DOREPLIFETIME_CONDITION(ANetPawn, isShipInitialized, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(ANetPawn, health, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(ANetPawn, maxHealth, COND_InitialOnly);
 }
 
 void ANetPawn::OnRep_ShipID()
@@ -115,9 +121,14 @@ void ANetPawn::InitializeShip()
 
 	myShipID = Controller->PlayerState->GetPlayerId();
 	myShipName = Controller->PlayerState->GetPlayerName();
+	health = startingHealth;
+	maxHealth = startingMaxHealth;
+	
+	myGameplayAttributes->InitializeAttributes(myShipID, health, maxHealth);
+
 	isShipInitialized = true;
 
-	UE_LOG(LogTemp, Warning, TEXT("ANetPawn::InitializeShip() myShipID = %d | myShipName = %s | %s"), myShipID, *myShipName, *GetDebugName(this));
+	UE_LOG(LogTemp, Warning, TEXT("ANetPawn::InitializeShip() myShipID = %d | myShipName = %s | HP: %i / %i | %s"), myShipID, *myShipName, health, maxHealth, *GetDebugName(this));
 
 }
 
