@@ -5,6 +5,7 @@
 #include "NetPC.h"
 #include "NetProjectile.h"
 #include "SFGameplayAttributes.h"
+#include "DrawDebugHelpers.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
 
@@ -89,6 +90,7 @@ void ANetPawn::Tick(float DeltaTime)
 	else
 	{
 		TurnShipTowardTargetHeading(DeltaTime);
+		DisplayHealth();
 	}
 
 	// ### [for DEBUG] logging out the ship's current location
@@ -158,6 +160,25 @@ void ANetPawn::Shoot()
 
 	ANetProjectile* spawnedProjectile = this->GetWorld()->SpawnActor<ANetProjectile>(projectileTemplate, rootComp->GetComponentLocation() + this->GetActorForwardVector() * ProjectileSpawnOffset, rootComp->GetComponentRotation(), FActorSpawnParameters());
 	spawnedProjectile->SetProjectileParams(myShipID);
+}
+
+void ANetPawn::BroadcastDamage_Implementation(int32 newHealth, int32 damage)
+{
+	health = newHealth;
+
+	if (!HasAuthority())
+	{
+		DrawDebugString(
+			GetWorld(),
+			GetActorLocation() + FVector(150 + FMath::RandRange(-30, 30), FMath::RandRange(-30, 30), 0),
+			FString::Printf(TEXT("%i"), damage),
+			nullptr,
+			FColor::Red,
+			5.0f,
+			true,
+			1.f
+		);
+	}
 }
 
 
@@ -278,4 +299,18 @@ void ANetPawn::TurnShipTowardTargetHeading(float DeltaTime)
 	SetHeading(newHeadingForThisTick);
 
 	// UE_LOG(LogTemp, Warning, TEXT("ANetPawn::TurnShipTowardTargetHeading() Current: %0.2f | Target: %0.2f | New: %0.2f | TurnAngle: %0.2f"), currentHeading, targetHeading, newHeadingForThisTick, turnAngle);
+}
+
+void ANetPawn::DisplayHealth()
+{
+	DrawDebugString(
+		GetWorld(),
+		GetActorLocation() + FVector(-50, 0, 0),
+		FString::FromInt(health),
+		nullptr,
+		FColor::White,
+		0.f,
+		true,
+		1.f
+	);
 }

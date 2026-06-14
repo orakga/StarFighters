@@ -343,6 +343,7 @@ void ANetPC::DebugDisplay()
 
 
 		// DRAW TEXT ------------------------------
+		/*
 		DrawDebugString(
 			theWorld, // const UWorld * InWorld,
 			shipLocation + FVector(0, -100, 0), // const FVector & TextLocation,
@@ -353,6 +354,7 @@ void ANetPC::DebugDisplay()
 			true, // bool bDrawShadow = false,
 			1 // float FontScale = 1.f
 		);
+		*/
 
 	}
 
@@ -377,6 +379,7 @@ void ANetPC::DebugDisplay()
 
 
 		// DRAW TEXT ------------------------------
+		/*
 		DrawDebugString(
 			theWorld, // const UWorld * InWorld,
 			shipLocation + FVector(0, +100, 0), // const FVector & TextLocation,
@@ -387,6 +390,7 @@ void ANetPC::DebugDisplay()
 			true, // bool bDrawShadow = false,
 			1 // float FontScale = 1.f
 		);
+		*/
 
 		if (isMousePressed)
 		{

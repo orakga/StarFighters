@@ -4,6 +4,7 @@
 #include "NetProjectile.h"
 #include "NetPawn.h"
 #include "SFGameplayAttributes.h"
+#include "DrawDebugHelpers.h"
 
 
 // Sets default values
@@ -106,6 +107,7 @@ void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, 
 		else
 		{
 			UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's MY ship | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherPawn->GetMyID());
+			isValidHit = canSelfDamage;
 		}
 	}
 	else
@@ -161,7 +163,7 @@ void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, 
 			UE_LOG(LogTemp, Error, TEXT("ANetProjectile::OverlapDetected() NO GameplayAttributes on the Victim | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
 		}
 		
-		BroadcastDamage();
+		BroadcastHit();
 		this->Destroy();
 	}
 	else
@@ -178,7 +180,7 @@ void ANetProjectile::SetProjectileParams(int32 shooterID)
 }
 
 
-void ANetProjectile::BroadcastDamage_Implementation()
+void ANetProjectile::BroadcastHit_Implementation()
 {
 	UE_LOG(LogTemp, Display, TEXT("ANetProjectile::BroadcastDamage() HIT! | %s (%i)"), *GetName(), myShooterID);
 
@@ -194,6 +196,12 @@ void ANetProjectile::BroadcastDamage_Implementation()
 	}
 
 	this->GetWorld()->SpawnActor<AActor>(hitFX_template, rootComp->GetComponentLocation(), FRotator(), FActorSpawnParameters());
+
+	// === DEBUG LINE to show LOCATION + DIRECTION of HIT =================
+	UWorld* theWorld = GetWorld();
+	DrawDebugLine(theWorld, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 15.f, FColor::Red, false, 5.f, 0, 8.f);
+	DrawDebugLine(theWorld, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 40.f, FColor::Red, false, 5.f, 0, 3.f);
+
 }
 
 

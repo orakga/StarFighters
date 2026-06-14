@@ -47,6 +47,9 @@ public:
 
 	int32 GetMyID() { return myShipID; }
 
+	UFUNCTION(NetMulticast, Reliable)
+		void BroadcastDamage(int32 newHealth, int32 damage);
+
 private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_ShipID)
@@ -76,6 +79,8 @@ private:
 	void SetHeading(float headingToSet);
 	void BroadcastState(float DeltaTime);
 	void TurnShipTowardTargetHeading(float DeltaTime);
+
+	void DisplayHealth();
 
 	FPlayerInputState playerInputState;
 

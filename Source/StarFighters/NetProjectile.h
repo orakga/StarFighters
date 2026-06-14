@@ -25,6 +25,9 @@ private:
 	UPROPERTY(EditAnywhere)
 		int32 projectileDamage = 10;
 
+	UPROPERTY(EditAnywhere)
+		bool canSelfDamage = false;
+
 	int32 myShooterID = -1;
 	bool projectileInitialized = false;
 
@@ -36,7 +39,7 @@ protected:
 		void OverlapDetected(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION(reliable, NetMulticast)
-		void BroadcastDamage();
+		void BroadcastHit();
 
 public:	
 	// Called every frame

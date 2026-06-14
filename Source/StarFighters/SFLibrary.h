@@ -33,6 +33,8 @@
 #define MoveInputDeadzone 0.5
 #define AimInputDeadzone 0.5
 
+#define SelfDamageMultiplier 0.5
+
 
 // STRUCTS ==========================================================
 
