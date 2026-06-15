@@ -181,6 +181,56 @@ void ANetPawn::BroadcastDamage_Implementation(int32 newHealth, int32 damage)
 	}
 }
 
+void ANetPawn::DestroyMe()
+{
+	UE_LOG(LogTemp, Error, TEXT("ANetPawn::DestroyMe() ID: % i | % s"), myShipID, *GetDebugName(this));
+
+	if( !HasAuthority() ) return;
+
+	ANetPC* myNetPC = Cast<ANetPC>( Controller );
+
+	if (myNetPC)
+	{
+		myNetPC->DestroyShip();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::DestroyMe() Could not get my NetPC | ID: % i | % s"), myShipID, *GetDebugName(this));
+	}
+
+}
+
+void ANetPawn::HandleDeath_Implementation()
+{
+	UE_LOG(LogTemp, Error, TEXT("ANetPawn::HandleDeath() ID: % i | % s"), myShipID, *GetDebugName(this));
+
+	if (HasAuthority()) // SERVER ==============
+	{
+		Destroy();
+	}
+	else // CLIENT ==================
+	{
+		PlayShipDestroyFX();
+	}
+}
+
+void ANetPawn::PlayShipDestroyFX()
+{
+	UE_LOG(LogTemp, Error, TEXT("ANetPawn::PlayShipDestroyFX() ID: % i | % s"), myShipID, *GetDebugName(this));
+
+	DrawDebugString(
+		GetWorld(),
+		GetActorLocation(),
+		TEXT("DESTROYED"),
+		nullptr,
+		FColor::Red,
+		5.0f,
+		true,
+		2.0f
+	);
+}
+
+
 
 void ANetPawn::Multicast_BroadcastState_Implementation(FVector shipPosition, FVector shipVelocity, float shipHeading)
 {

@@ -50,6 +50,11 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 		void BroadcastDamage(int32 newHealth, int32 damage);
 
+	void DestroyMe();
+
+	UFUNCTION(NetMulticast, Reliable)
+		void HandleDeath();
+
 private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_ShipID)
@@ -81,6 +86,7 @@ private:
 	void TurnShipTowardTargetHeading(float DeltaTime);
 
 	void DisplayHealth();
+	void PlayShipDestroyFX();
 
 	FPlayerInputState playerInputState;
 

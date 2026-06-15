@@ -58,6 +58,8 @@ public:
 
 	void AssignShipToPlayer();
 
+	void DestroyShip();
+
 private:
 
 	void SpawnShip();

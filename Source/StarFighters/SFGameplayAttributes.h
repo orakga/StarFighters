@@ -34,5 +34,6 @@ private:
 	int32 health = 0;
 	int32 maxHealth = 0;
 	int32 playerID = 0;
+	bool isAlive = true;
 	
 };

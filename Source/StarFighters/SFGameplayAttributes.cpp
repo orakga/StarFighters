@@ -49,6 +49,8 @@ void USFGameplayAttributes::ProcessDamage(int32 damage, int32 shooterID, AActor*
 {
 	UE_LOG(LogTemp, Error, TEXT("USFGameplayAttributes::ProcessDamage() %s (%i) | Shooter: %s (%i) | Damage: %i | Health: %i "), *GetReadableName(), playerID, *damageSourceActor->GetHumanReadableName(), shooterID, damage, health);
 
+	if( !isAlive ) return; // SAFETY CHECK
+
 	int32 damageTaken = damage;
 	float damageMultiplier = 1.0f;
 
@@ -93,6 +95,21 @@ void USFGameplayAttributes::ProcessDamage(int32 damage, int32 shooterID, AActor*
 	if (health <= 0)
 	{
 		UE_LOG(LogTemp, Error, TEXT("USFGameplayAttributes::ProcessDamage() %s (%i) | Shooter: %s (%i) | THIS ACTOR IS DEAD"), *GetReadableName(), playerID, *damageSourceActor->GetHumanReadableName(), shooterID);
+		isAlive = false;
+
+		// If victim was A PAWN ==============================
+		if (myPawnPtr.IsValid())
+		{
+			ANetPawn* myPawn = myPawnPtr.Get();
+			if (myPawn)
+			{
+				myPawn->DestroyMe();
+			}
+		}
+
+		// ADD HERE for NEW TYPES ============================
+		// ......
+
 	}
 
 

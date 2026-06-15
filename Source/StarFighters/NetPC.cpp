@@ -318,6 +318,17 @@ void ANetPC::AssignShipToPlayer()
 	SetInputMappingContext(IMC_Playing, "PLAYING");
 }
 
+void ANetPC::DestroyShip()
+{
+	UE_LOG(LogTemp, Error, TEXT("ANetPC::DestroyShip() Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
+
+	// Send RPC to CLIENT for SPECTATOR MODE
+
+	UnPossess();
+	myShip->HandleDeath();
+	myShip.Reset();
+}
+
 
 void ANetPC::DebugDisplay()
 {
