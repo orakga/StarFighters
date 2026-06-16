@@ -128,6 +128,7 @@ void ANetPC::SetInputMappingContext(class UInputMappingContext* newIMC, FString 
 	}
 
 	int32 inputMappingPriority = 1;
+	SFInputSystem->ClearAllMappings();
 	SFInputSystem->AddMappingContext(newIMC, inputMappingPriority);
 	UE_LOG(LogTemp, Error, TEXT("ANetPC::SetInputMappingContext() IMC: %s | %s"), *newIMCmessage, *GetName());
 
@@ -322,13 +323,19 @@ void ANetPC::DestroyShip()
 {
 	UE_LOG(LogTemp, Error, TEXT("ANetPC::DestroyShip() Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
 
-	// Send RPC to CLIENT for SPECTATOR MODE
-
+	StartSpectating();
 	UnPossess();
 	myShip->HandleDeath();
 	myShip.Reset();
 }
 
+void ANetPC::StartSpectating_Implementation()
+{
+	myShip.Reset();
+	SetInputMappingContext(IMC_Spectating, TEXT("SPECTATING"));
+	myCamera->SpectatorMode();
+	UE_LOG(LogTemp, Error, TEXT("ANetPC::StartSpectating() Returning to SPECTATOR MODE | %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
+}
 
 void ANetPC::DebugDisplay()
 {

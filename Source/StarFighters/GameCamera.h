@@ -20,13 +20,14 @@ private:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DetaTime) override;
 	
-	AActor* myTarget;
+	TWeakObjectPtr<AActor> myTarget; // AActor* myTarget;
+	TWeakObjectPtr<UPrimitiveComponent> targetRootComp; // UPrimitiveComponent* targetRootComp;
 	
-	UPrimitiveComponent* targetRootComp;
 	UPrimitiveComponent* myRootComp;
 
 public:
 
 	void SetTarget(class AActor* newTarget);
+	void SpectatorMode();
 
 };

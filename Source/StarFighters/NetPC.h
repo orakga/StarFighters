@@ -67,6 +67,9 @@ private:
 	UFUNCTION(reliable, Server)
 		void Server_SpawnAndPossess();
 
+	UFUNCTION(reliable, client)
+		void StartSpectating();
+
 	UFUNCTION(unreliable, server)
 		void Server_UpdatePlayerInput(FPlayerInputState newPlayerInputState);
 

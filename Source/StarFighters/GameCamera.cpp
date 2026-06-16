@@ -16,7 +16,8 @@ void AGameCamera::BeginPlay()
 	Super::BeginPlay();
 
 	myRootComp = (UPrimitiveComponent*)this->GetRootComponent();
-	myTarget = nullptr;
+	myTarget.Reset(); // myTarget = nullptr;
+	targetRootComp.Reset();
 }
 
 
@@ -24,9 +25,9 @@ void AGameCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (myTarget)  // ### TECH DEBT? ### Better to use TWeakObjPtr / IsValid()??
+	if (myTarget.IsValid())  // ### TECH DEBT? ### Better to use TWeakObjPtr / IsValid()??
 	{
-		if (myRootComp && targetRootComp)
+		if (myRootComp && targetRootComp.IsValid())
 		{
 			myRootComp->SetWorldLocation(targetRootComp->GetComponentLocation() + FixedCameraLocation * 0.5f);
 		}
@@ -43,9 +44,9 @@ void AGameCamera::SetTarget(class AActor* newTarget)
 		return;
 	}
 
-	targetRootComp = (UPrimitiveComponent*)newTarget->GetRootComponent();
+	targetRootComp = Cast<UPrimitiveComponent>(newTarget->GetRootComponent());  //  (UPrimitiveComponent*)newTarget->GetRootComponent();
 
-	if (!targetRootComp)
+	if (!targetRootComp.IsValid())
 	{
 		UE_LOG(LogTemp, Error, TEXT("AGameCamera::SetTarget() FAILED: Could not get RootComponent of newTarget!"));
 		return;
@@ -53,4 +54,13 @@ void AGameCamera::SetTarget(class AActor* newTarget)
 
 	myTarget = newTarget;
 	UE_LOG(LogTemp, Warning, TEXT("AGameCamera::SetTarget() NEW TARGET: %s"), *myTarget->GetName());
+}
+
+
+void AGameCamera::SpectatorMode()
+{
+	myTarget.Reset();
+	targetRootComp.Reset();
+
+	SetActorLocationAndRotation(FixedCameraLocation, FixedCameraRotation);
 }
