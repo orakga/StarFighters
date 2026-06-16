@@ -83,11 +83,11 @@ void ANetProjectile::Tick(float DeltaTime)
 
 void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
+	// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
 
 	if (!IsInitalized())
 	{
-		UE_LOG(LogTemp, Error, TEXT("ANetProjectile::OverlapDetected() This Projectile is NOT INITALIZED | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
+		UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() This Projectile is NOT INITALIZED | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
 		return;
 	}
 
@@ -97,59 +97,59 @@ void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, 
 	ANetPawn* otherPawn = Cast<ANetPawn>(OtherActor);
 	if (otherPawn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ANetProjectile::OverlapDetected() It's a SHIP | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
+		// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's a SHIP | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
 
 		if (myShooterID != otherPawn->GetMyID())  // Is this MY OWN ship or not?
 		{
-			UE_LOG(LogTemp, Error, TEXT("ANetProjectile::OverlapDetected() It's an ENEMY SHIP! | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherPawn->GetMyID());
+			// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's an ENEMY SHIP! | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherPawn->GetMyID());
 			isValidHit = true;
 		}
 		else
 		{
-			UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's MY ship | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherPawn->GetMyID());
+			// UE_LOG(LogTemp, Warning, TEXT("ANetProjectile::OverlapDetected() It's MY ship | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherPawn->GetMyID());
 			isValidHit = canSelfDamage;
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's NOT A SHIP | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
+		// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's NOT A SHIP | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
 	}
 
 	// Test if the other Actor was a PROJECTILE
 	ANetProjectile* otherProjectile = Cast<ANetProjectile>(OtherActor);
 	if (otherProjectile)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ANetProjectile::OverlapDetected() It's a PROJECTILE | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("ANetProjectile::OverlapDetected() It's a PROJECTILE | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
 
 		if (otherProjectile->IsInitalized())
 		{
 			if (myShooterID != otherProjectile->GetMyShooterID()) // Is this MY OWN projectile or not?
 			{
-				UE_LOG(LogTemp, Error, TEXT("ANetProjectile::OverlapDetected() It's an ENEMY PROJECTILE! | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherProjectile->GetMyShooterID());
+				// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's an ENEMY PROJECTILE! | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherProjectile->GetMyShooterID());
 				isValidHit = true;
 			}
 			else
 			{
-				UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's MY PROJECTILE | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherProjectile->GetMyShooterID());
+				// UE_LOG(LogTemp, Warning, TEXT("ANetProjectile::OverlapDetected() It's MY PROJECTILE | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherProjectile->GetMyShooterID());
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("ANetProjectile::OverlapDetected() The other Projectile is NOT INITALIZED | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
+			UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() The other Projectile is NOT INITALIZED | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
 		}
 
 
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's NOT A PROJECTILE | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
+		// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's NOT A PROJECTILE | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
 	}
 
 
 	// Check if there was a Valid Hit found
 	if (isValidHit)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ANetProjectile::OverlapDetected() VALID HIT | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
+		// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() VALID HIT | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
 		
 		USFGameplayAttributes* victimGameplayAttributes = OtherActor->FindComponentByClass<USFGameplayAttributes>();
 		if (victimGameplayAttributes)
@@ -160,7 +160,7 @@ void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, 
 		else
 		{
 			// OtherActor DOES NOT have a GameplayAttributes component
-			UE_LOG(LogTemp, Error, TEXT("ANetProjectile::OverlapDetected() NO GameplayAttributes on the Victim | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("ANetProjectile::OverlapDetected() NO GameplayAttributes on the Victim | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
 		}
 		
 		BroadcastHit();
@@ -168,7 +168,7 @@ void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, 
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ANetProjectile::OverlapDetected() NOT A HIT | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("ANetProjectile::OverlapDetected() NOT A HIT | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
 	}
 }
 
@@ -182,7 +182,7 @@ void ANetProjectile::SetProjectileParams(int32 shooterID)
 
 void ANetProjectile::BroadcastHit_Implementation()
 {
-	UE_LOG(LogTemp, Display, TEXT("ANetProjectile::BroadcastDamage() HIT! | %s (%i)"), *GetName(), myShooterID);
+	// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::BroadcastDamage() HIT! | %s (%i)"), *GetName(), myShooterID);
 
 	if (HasAuthority())
 	{
@@ -221,7 +221,7 @@ void ANetProjectile::CheckForOutOfBounds()
 				)
 			{
 				// Destroy the Projectile
-				UE_LOG(LogTemp, Display, TEXT("ANetProjectile::CheckForOutOfBounds() OUT OF BOUNDS | %s | %i / %i"), *GetName(), (int32) currentLocation.X, (int32) currentLocation.Y);
+				// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::CheckForOutOfBounds() OUT OF BOUNDS | %s | %i / %i"), *GetName(), (int32) currentLocation.X, (int32) currentLocation.Y);
 				this->Destroy();
 			}
 		}

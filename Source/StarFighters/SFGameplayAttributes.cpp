@@ -47,7 +47,7 @@ void USFGameplayAttributes::InitializeAttributes(int32 newPlayerID, int32 initia
 
 void USFGameplayAttributes::ProcessDamage(int32 damage, int32 shooterID, AActor* damageSourceActor)
 {
-	UE_LOG(LogTemp, Error, TEXT("USFGameplayAttributes::ProcessDamage() %s (%i) | Shooter: %s (%i) | Damage: %i | Health: %i "), *GetReadableName(), playerID, *damageSourceActor->GetHumanReadableName(), shooterID, damage, health);
+	// UE_LOG(LogTemp, Display, TEXT("USFGameplayAttributes::ProcessDamage() %s (%i) | Shooter: %s (%i) | Damage: %i | Health: %i "), *GetReadableName(), playerID, *damageSourceActor->GetHumanReadableName(), shooterID, damage, health);
 
 	if( !isAlive ) return; // SAFETY CHECK
 

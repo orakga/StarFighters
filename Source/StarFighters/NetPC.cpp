@@ -30,7 +30,7 @@ void ANetPC::BeginPlay()
 
 	if (PlayerState)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ANetPC::BeginPlay() | PC Name: %s | PS Name: %s | PID: %i"), *GetName(), *PlayerState->GetPlayerName(), PlayerState->GetPlayerId());
+		UE_LOG(LogTemp, Display, TEXT("ANetPC::BeginPlay() | PC Name: %s | PS Name: %s | PID: %i"), *GetName(), *PlayerState->GetPlayerName(), PlayerState->GetPlayerId());
 	}
 	else
 	{
@@ -101,7 +101,7 @@ void ANetPC::SetupInputComponent()
 		return;
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("ANetPC::SetupInputComponent() EnhancedInputComponent SECURED | %s"), *GetName());
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::SetupInputComponent() EnhancedInputComponent SECURED | %s"), *GetName());
 
 	SFInputComponent->BindAction(IA_SpawnShip, ETriggerEvent::Triggered, this, &ANetPC::SpawnShip);
 	SFInputComponent->BindAction(IA_ReturnToMenu, ETriggerEvent::Triggered, this, &ANetPC::ReturnToMenu);
@@ -115,7 +115,7 @@ void ANetPC::SetInputMappingContext(class UInputMappingContext* newIMC, FString 
 {
 	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Error, TEXT("ANetPC::SetInputMappingContext() This is Authority! | %s"), *GetName());
+		UE_LOG(LogTemp, Display, TEXT("ANetPC::SetInputMappingContext() This is Authority! | %s"), *GetName());
 		return;
 	}
 
@@ -130,7 +130,7 @@ void ANetPC::SetInputMappingContext(class UInputMappingContext* newIMC, FString 
 	int32 inputMappingPriority = 1;
 	SFInputSystem->ClearAllMappings();
 	SFInputSystem->AddMappingContext(newIMC, inputMappingPriority);
-	UE_LOG(LogTemp, Error, TEXT("ANetPC::SetInputMappingContext() IMC: %s | %s"), *newIMCmessage, *GetName());
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::SetInputMappingContext() IMC: %s | %s"), *newIMCmessage, *GetName());
 
 }
 
@@ -142,7 +142,7 @@ void ANetPC::SpawnShip()
 
 void ANetPC::Server_SpawnAndPossess_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ANetPC::Server_SpawnAndPossess() SPAWNING | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+	UE_LOG(LogTemp, Display, TEXT("ANetPC::Server_SpawnAndPossess() SPAWNING | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
 
 	if (GetPawn())
 	{
@@ -313,7 +313,7 @@ void ANetPC::AssignShipToPlayer()
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("ANetPC::AssignShipToPlayer() GOT my ship | Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
+	UE_LOG(LogTemp, Display, TEXT("ANetPC::AssignShipToPlayer() GOT my ship | Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
 
 	myCamera->SetTarget(myShip.Get());
 	SetInputMappingContext(IMC_Playing, "PLAYING");
@@ -321,7 +321,7 @@ void ANetPC::AssignShipToPlayer()
 
 void ANetPC::DestroyShip()
 {
-	UE_LOG(LogTemp, Error, TEXT("ANetPC::DestroyShip() Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::DestroyShip() Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
 
 	StartSpectating();
 	UnPossess();
@@ -334,7 +334,7 @@ void ANetPC::StartSpectating_Implementation()
 	myShip.Reset();
 	SetInputMappingContext(IMC_Spectating, TEXT("SPECTATING"));
 	myCamera->SpectatorMode();
-	UE_LOG(LogTemp, Error, TEXT("ANetPC::StartSpectating() Returning to SPECTATOR MODE | %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::StartSpectating() Returning to SPECTATOR MODE | %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
 }
 
 void ANetPC::DebugDisplay()

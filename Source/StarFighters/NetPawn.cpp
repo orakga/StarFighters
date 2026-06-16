@@ -49,12 +49,12 @@ void ANetPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 
 void ANetPawn::OnRep_ShipID()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ANetPawn::OnRep_ShipID() ShipID: %d"), myShipID);
+	UE_LOG(LogTemp, Display, TEXT("ANetPawn::OnRep_ShipID() ShipID: %d"), myShipID);
 }
 
 void ANetPawn::OnRep_ShipName()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ANetPawn::OnRep_ShipName() ShipName: %s"), *myShipName);
+	UE_LOG(LogTemp, Display, TEXT("ANetPawn::OnRep_ShipName() ShipName: %s"), *myShipName);
 }
 
 void ANetPawn::OnRep_ShipInitialized()
@@ -107,7 +107,7 @@ void ANetPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ANetPawn::InitializeShip()
 {
-	UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() | %s"), *GetDebugName(this));
+	UE_LOG(LogTemp, Display, TEXT("ANetPawn::InitializeShip() | %s"), *GetDebugName(this));
 
 	if (!HasAuthority())
 	{
@@ -183,7 +183,7 @@ void ANetPawn::BroadcastDamage_Implementation(int32 newHealth, int32 damage)
 
 void ANetPawn::DestroyMe()
 {
-	UE_LOG(LogTemp, Error, TEXT("ANetPawn::DestroyMe() ID: % i | % s"), myShipID, *GetDebugName(this));
+	// UE_LOG(LogTemp, Error, TEXT("ANetPawn::DestroyMe() ID: % i | % s"), myShipID, *GetDebugName(this));
 
 	if( !HasAuthority() ) return;
 
@@ -202,7 +202,7 @@ void ANetPawn::DestroyMe()
 
 void ANetPawn::HandleDeath_Implementation()
 {
-	UE_LOG(LogTemp, Error, TEXT("ANetPawn::HandleDeath() ID: % i | % s"), myShipID, *GetDebugName(this));
+	// UE_LOG(LogTemp, Error, TEXT("ANetPawn::HandleDeath() ID: % i | % s"), myShipID, *GetDebugName(this));
 
 	if (HasAuthority()) // SERVER ==============
 	{
@@ -216,7 +216,7 @@ void ANetPawn::HandleDeath_Implementation()
 
 void ANetPawn::PlayShipDestroyFX()
 {
-	UE_LOG(LogTemp, Error, TEXT("ANetPawn::PlayShipDestroyFX() ID: % i | % s"), myShipID, *GetDebugName(this));
+	// UE_LOG(LogTemp, Error, TEXT("ANetPawn::PlayShipDestroyFX() ID: % i | % s"), myShipID, *GetDebugName(this));
 
 	DrawDebugString(
 		GetWorld(),

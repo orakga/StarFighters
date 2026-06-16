@@ -33,7 +33,7 @@ void ANetGameMode::BeginPlay()
 
 void ANetGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	UE_LOG(LogTemp, Warning, TEXT("1) ANetGameMode::PreLogin() | Addr: %s | Options: %s"), *Address, *Options);
+	UE_LOG(LogTemp, Display, TEXT("1) ANetGameMode::PreLogin() | Addr: %s | Options: %s"), *Address, *Options);
 
 	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 }
@@ -41,7 +41,7 @@ void ANetGameMode::PreLogin(const FString& Options, const FString& Address, cons
 
 APlayerController* ANetGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	UE_LOG(LogTemp, Warning, TEXT("2-A) ANetGameMode::Login() | Options: %s"), *Options);
+	UE_LOG(LogTemp, Display, TEXT("2-A) ANetGameMode::Login() | Options: %s"), *Options);
 
 	APlayerController* newController = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
 
@@ -53,7 +53,7 @@ APlayerController* ANetGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRole
 
 void ANetGameMode::PostLogin(APlayerController* NewPlayer)
 {
-	UE_LOG(LogTemp, Warning, TEXT("5-A) ANetGameMode::PostLogin() | PC Name: %s | PS Name: %s | ID: %i"), *NewPlayer->GetName(), *NewPlayer->PlayerState->GetPlayerName(), NewPlayer->PlayerState->GetPlayerId());
+	UE_LOG(LogTemp, Display, TEXT("5-A) ANetGameMode::PostLogin() | PC Name: %s | PS Name: %s | ID: %i"), *NewPlayer->GetName(), *NewPlayer->PlayerState->GetPlayerName(), NewPlayer->PlayerState->GetPlayerId());
 
 	Super::PostLogin(NewPlayer);
 
@@ -69,7 +69,7 @@ void ANetGameMode::PostLogin(APlayerController* NewPlayer)
 
 APlayerController* ANetGameMode::SpawnPlayerController(ENetRole InRemoteRole, const FString& Options)
 {
-	UE_LOG(LogTemp, Warning, TEXT("3) ANetGameMode::SpawnPlayerController() | Options: %s"), *Options);
+	UE_LOG(LogTemp, Display, TEXT("3) ANetGameMode::SpawnPlayerController() | Options: %s"), *Options);
 
 	APlayerController* newController = Super::SpawnPlayerController(InRemoteRole, Options);
 
@@ -79,11 +79,11 @@ APlayerController* ANetGameMode::SpawnPlayerController(ENetRole InRemoteRole, co
 
 FString ANetGameMode::InitNewPlayer(APlayerController* NewPlayerController, const FUniqueNetIdRepl& UniqueId, const FString& Options, const FString& Portal)
 {
-	UE_LOG(LogTemp, Warning, TEXT("4-A) ANetGameMode::InitNewPlayer() | PC Name: %s | PS Name: %s | ID: %i | Options: %s"), *NewPlayerController->GetName(), *NewPlayerController->PlayerState->GetPlayerName(), NewPlayerController->PlayerState->GetPlayerId(), *Options);
+	UE_LOG(LogTemp, Display, TEXT("4-A) ANetGameMode::InitNewPlayer() | PC Name: %s | PS Name: %s | ID: %i | Options: %s"), *NewPlayerController->GetName(), *NewPlayerController->PlayerState->GetPlayerName(), NewPlayerController->PlayerState->GetPlayerId(), *Options);
 
 	FString ErrorMessage = Super::InitNewPlayer(NewPlayerController, UniqueId, Options, Portal);
 
-	UE_LOG(LogTemp, Warning, TEXT("4-B) ANetGameMode::InitNewPlayer() | PC Name: %s | PS Name: %s | ID: %i | Options: %s"), *NewPlayerController->GetName(), *NewPlayerController->PlayerState->GetPlayerName(), NewPlayerController->PlayerState->GetPlayerId(), *Options);
+	UE_LOG(LogTemp, Display, TEXT("4-B) ANetGameMode::InitNewPlayer() | PC Name: %s | PS Name: %s | ID: %i | Options: %s"), *NewPlayerController->GetName(), *NewPlayerController->PlayerState->GetPlayerName(), NewPlayerController->PlayerState->GetPlayerId(), *Options);
 
 	// Capture Player Name from URL ======
 	FString RequestedName = UGameplayStatics::ParseOption(Options, TEXT("PlayerName")).Left(PlayerNameMaxLength);
