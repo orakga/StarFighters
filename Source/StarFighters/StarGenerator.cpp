@@ -9,15 +9,15 @@ void AStarGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	for (int i = 0; i < StarfieldAreaQuantity; i++)
+	for (int i = 0; i < areaQuantity; i++)
 	{
 		// ## SPAWN ONE STAR AT A TIME ##
 		GetWorld()->SpawnActor<AActor>(
 			StarModel,
 			FVector( 
-				FMath::RandRange(StarfieldAreaLeft, StarfieldAreaRight),
-				FMath::RandRange(StarfieldAreaFront, StarfieldAreaBack),
-				FMath::RandRange(StarfieldAreaBottom, StarfieldAreaTop)
+				FMath::RandRange(areaLeft, areaRight),
+				FMath::RandRange(areaFront, areaBack),
+				FMath::RandRange(areaBottom, areaTop)
 				),
 			FRotator(),
 			FActorSpawnParameters()
