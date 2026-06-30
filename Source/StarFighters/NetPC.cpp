@@ -89,6 +89,18 @@ void ANetPC::MessageToClient_Implementation(const FString& message)
 	UE_LOG(LogTemp, Error, TEXT("ANetPC::MessageToClient() | %s"), *message);
 }
 
+void ANetPC::PostLoginInitialization_Implementation(int32 newPlayerID, const FString& newPlayerName, const FString& newServerName)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::PostLoginInitialization() | ID: %i | Player Name: %s | Server Name: %s"), newPlayerID, *newPlayerName, *newServerName);
+
+	playerID = newPlayerID;
+	playerName = newPlayerName;
+	serverName = newServerName;
+
+	// InitializeInGameOverlay(newPlayerID, newPlayerName, newServerName);
+}
+
+
 void ANetPC::SetupInputComponent()
 {
 	Super::SetupInputComponent();

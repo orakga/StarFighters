@@ -24,6 +24,12 @@ public:
 
 	UFUNCTION(reliable, client)
 		void MessageToClient(const FString& message);
+
+	UFUNCTION(reliable, client)
+		void PostLoginInitialization(int32 newPlayerID, const FString& newPlayerName, const FString& newServerName);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+		void InitializeInGameOverlay(int32 newPlayerID, const FString& newPlayerName, const FString& newServerName);
 	
 	virtual void SetupInputComponent() override;
 
@@ -98,4 +104,16 @@ private:
 	FPlayerInputState playerInputState;
 	bool isMousePressed = false;
 	FVector mouseHitLocation;
+
+protected:
+
+	UPROPERTY(BlueprintReadOnly)
+		int32 playerID;
+
+	UPROPERTY(BlueprintReadOnly)
+		FString playerName;
+
+	UPROPERTY(BlueprintReadOnly)
+		FString serverName;
+
 };

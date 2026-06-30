@@ -64,6 +64,7 @@ void ANetGameMode::PostLogin(APlayerController* NewPlayer)
 	// Send the Server Name to the new Client
 	ANetPC* newPC = Cast<ANetPC>(NewPlayer);
 	newPC->MessageToClient("ANetGameMode::PostLogin() | Welcome to: " + serverName);
+	newPC->PostLoginInitialization(NewPlayer->PlayerState->GetPlayerId(), NewPlayer->PlayerState->GetPlayerName(), serverName);
 }
 
 
