@@ -30,6 +30,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 		void InitializeInGameOverlay(int32 newPlayerID, const FString& newPlayerName, const FString& newServerName);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+		void AddSystemMessage(const FString& newSysMsg);
 	
 	virtual void SetupInputComponent() override;
 

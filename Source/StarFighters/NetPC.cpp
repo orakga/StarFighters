@@ -43,6 +43,8 @@ void ANetPC::BeginPlay()
 	{
 		myCamera = this->GetWorld()->SpawnActor<AGameCamera>(camera_Template, FixedCameraLocation, FixedCameraRotation, FActorSpawnParameters());
 		SetViewTarget(myCamera);
+
+		AddSystemMessage(FString::Printf(TEXT("Game Started | ID: %i | Player Name: %s | Server Name: %s"), playerID, *playerName, *serverName));
 	}
 
 }
@@ -329,6 +331,8 @@ void ANetPC::AssignShipToPlayer()
 
 	myCamera->SetTarget(myShip.Get());
 	SetInputMappingContext(IMC_Playing, "PLAYING");
+
+	AddSystemMessage(FString::Printf(TEXT("Your Ship is Ready!! =============")));
 }
 
 void ANetPC::DestroyShip()
@@ -346,6 +350,9 @@ void ANetPC::StartSpectating_Implementation()
 	myShip.Reset();
 	SetInputMappingContext(IMC_Spectating, TEXT("SPECTATING"));
 	myCamera->SpectatorMode();
+
+	AddSystemMessage(FString::Printf(TEXT("Returning to SPECTATING mode ============")));
+
 	UE_LOG(LogTemp, Warning, TEXT("ANetPC::StartSpectating() Returning to SPECTATOR MODE | %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
 }
 

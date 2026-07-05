@@ -61,6 +61,8 @@ void ANetPawn::OnRep_ShipInitialized()
 {
 	UE_LOG(LogTemp, Warning, TEXT("ANetPawn::OnRep_ShipInitialized() myShipID = %d | myShipName = %s | %s"), myShipID, *myShipName, *GetDebugName(this));
 
+	Cast<ANetPC>( GetWorld()->GetFirstPlayerController() )->AddSystemMessage(FString::Printf(TEXT("New Ship | ID: %i | Name: %s"), myShipID, *myShipName));
+
 	// Need to check for Controller to prevent OTHER clients from crashing
 	if (!Controller)
 	{
@@ -210,6 +212,8 @@ void ANetPawn::HandleDeath_Implementation()
 	}
 	else // CLIENT ==================
 	{
+		Cast<ANetPC>(GetWorld()->GetFirstPlayerController())->AddSystemMessage(FString::Printf(TEXT("SHIP DESTROYED | ID: %i | Name: %s"), myShipID, *myShipName));
+
 		PlayShipDestroyFX();
 	}
 }
