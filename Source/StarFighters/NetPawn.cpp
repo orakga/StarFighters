@@ -3,7 +3,8 @@
 
 #include "NetPawn.h"
 #include "NetPC.h"
-#include "NetProjectile.h"
+// #include "NetProjectile.h"
+#include "NetWeapon.h"
 #include "SFGameplayAttributes.h"
 #include "DrawDebugHelpers.h"
 #include "Net/UnrealNetwork.h"
@@ -130,6 +131,26 @@ void ANetPawn::InitializeShip()
 	
 	myGameplayAttributes->InitializeAttributes(myShipID, health, maxHealth);
 
+	if (!weapon_template)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon_template NOT SET | %s"), *GetDebugName(this));
+	}
+	else
+	{
+		myWeapon = GetWorld()->SpawnActor<ANetWeapon>(weapon_template, FVector(), FRotator(), FActorSpawnParameters());
+
+		if (!myWeapon)
+		{
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED to spawn weapon | %s"), *GetDebugName(this));
+		}
+		else
+		{
+			myWeapon->AttachToComponent(rootComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			myWeapon->SetWeaponParameters(myShipID);
+		}
+	}
+
+
 	isShipInitialized = true;
 
 	UE_LOG(LogTemp, Warning, TEXT("ANetPawn::InitializeShip() myShipID = %d | myShipName = %s | HP: %i / %i | %s"), myShipID, *myShipName, health, maxHealth, *GetDebugName(this));
@@ -154,14 +175,13 @@ void ANetPawn::Shoot()
 		return;
 	}
 
-	if (!projectileTemplate)
+	if (!myWeapon)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ANetPawn::Shoot() Projectile TEMPLATE is NOT VALID | ID: % i | % s"), myShipID, *GetDebugName(this));
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::Shoot() Weapon is NOT VALID | ID: % i | % s"), myShipID, *GetDebugName(this));
 		return;
 	}
 
-	ANetProjectile* spawnedProjectile = this->GetWorld()->SpawnActor<ANetProjectile>(projectileTemplate, rootComp->GetComponentLocation() + this->GetActorForwardVector() * ProjectileSpawnOffset, rootComp->GetComponentRotation(), FActorSpawnParameters());
-	spawnedProjectile->SetProjectileParams(myShipID);
+	myWeapon->Shoot();
 }
 
 void ANetPawn::BroadcastDamage_Implementation(int32 newHealth, int32 damage)

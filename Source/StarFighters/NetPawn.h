@@ -34,8 +34,11 @@ public:
 	void InitializeShip();
 	void SetPlayerInput(FPlayerInputState newPlayerInputState);
 
+	// UPROPERTY(EditAnywhere)
+		// TSubclassOf<class ANetProjectile> projectileTemplate;
+
 	UPROPERTY(EditAnywhere)
-		TSubclassOf<class ANetProjectile> projectileTemplate;
+		TSubclassOf<class ANetWeapon> weapon_template;
 
 	UPROPERTY(EditAnywhere)
 		int32 startingHealth = 100;
@@ -99,6 +102,8 @@ private:
 
 	UPROPERTY(Replicated)
 		int32 maxHealth = 0;
+
+	class ANetWeapon* myWeapon;
 
 	float shipAcceleration = 10000;
 	float shipTurnSpeed = 180;
