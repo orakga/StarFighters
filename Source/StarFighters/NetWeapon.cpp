@@ -23,6 +23,16 @@ void ANetWeapon::BeginPlay()
 
 	rootComp = (UPrimitiveComponent*) (this->GetRootComponent());
 	theWorld = GetWorld();
+
+	chargesReady = initialCharges;
+
+	if (isAutomatic || hasCooldown || canStoreCharges)
+	{
+		if (HasAuthority())
+		{
+			SetActorTickEnabled(true);
+		}
+	}
 	
 }
 
@@ -30,6 +40,13 @@ void ANetWeapon::BeginPlay()
 void ANetWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	CooldownManagement(DeltaTime);
+
+	if (isAutomatic && isTriggerDown)
+	{
+		Shoot();
+	}
 
 }
 
@@ -44,12 +61,39 @@ void ANetWeapon::SetWeaponParameters(int32 incomingID)
 	shooterID = incomingID;
 }
 
+void ANetWeapon::Trigger(bool isActive)
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	isTriggerDown = isActive;
+
+	if (isActive)  // Shoot button was JUST PRESSED
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ANetWeapon::Trigger() Shooter ID: % i | PRESSED | % s"), shooterID, *GetDebugName(this));
+
+		Shoot();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT("ANetWeapon::Trigger() Shooter ID: % i | RELEASED | % s"), shooterID, *GetDebugName(this));
+	}
+
+}
+
 
 void ANetWeapon::Shoot()
 {
 	if (!HasAuthority())
 	{
 		UE_LOG(LogTemp, Error, TEXT("ANetWeapon::Shoot() Has to run AT SERVER | ID: % i | % s"), shooterID, *GetDebugName(this));
+		return;
+	}
+
+	if (!IsReadyToShoot())
+	{
 		return;
 	}
 
@@ -61,4 +105,69 @@ void ANetWeapon::Shoot()
 
 	ANetProjectile* spawnedProjectile = theWorld->SpawnActor<ANetProjectile>(projectileTemplate, rootComp->GetComponentLocation() + this->GetActorForwardVector() * ProjectileSpawnOffset, rootComp->GetComponentRotation(), FActorSpawnParameters());
 	spawnedProjectile->SetProjectileParams(shooterID);
+
+	// ======================= RESET TIMERS + CHARGES ===========================
+
+	if (canStoreCharges)
+	{
+		chargesReady--;
+	}
+
+	if (hasCooldown && cooldownTime > 0.f)
+	{
+		timeSinceWeaponShot = 0.f;
+	}
+
+}
+
+void ANetWeapon::CooldownManagement(float deltaTime)
+{
+	// Manage COOLDOWN TIME ================================================
+	if (hasCooldown && cooldownTime > 0.f)
+	{
+		if (timeSinceWeaponShot < cooldownTime)
+		{
+			timeSinceWeaponShot += deltaTime;
+
+			if (timeSinceWeaponShot >= cooldownTime)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ANetWeapon::CooldownManagement() WEAPON READY | ID: % i | % s"), shooterID, *GetDebugName(this));
+			}
+		}
+	}
+
+
+	// Manage REFILLING CHARGES ============================================
+	if (canStoreCharges && maxCharges > 0 && chargesReady < maxCharges)
+	{
+		timeSinceRecharge += deltaTime;
+
+		if (timeSinceRecharge > rechargeTime)
+		{
+			chargesReady++;
+			timeSinceRecharge = 0;
+
+			UE_LOG(LogTemp, Warning, TEXT("ANetWeapon::CooldownManagement() CHARGE ADDED | ID: % i | % s | Charges: %d / %d"), shooterID, *GetDebugName(this), chargesReady, maxCharges);
+		}
+	}
+}
+
+bool ANetWeapon::IsReadyToShoot()
+{
+	if (!isTriggerDown)
+	{
+		return false;
+	}
+
+	if (hasCooldown && cooldownTime > 0.f && timeSinceWeaponShot < cooldownTime)
+	{
+		return false;
+	}
+
+	if (canStoreCharges && chargesReady <= 0)
+	{
+		return false;
+	}
+
+	return true;
 }

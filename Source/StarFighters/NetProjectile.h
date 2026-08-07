@@ -20,7 +20,8 @@ private:
 	UPrimitiveComponent* rootComp;
 	UPrimitiveComponent* colliderComp;
 
-	float projectileSpeed = 300;
+	UPROPERTY(EditAnywhere)
+		float projectileSpeed = 300;
 
 	UPROPERTY(EditAnywhere)
 		int32 projectileDamage = 10;

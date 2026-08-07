@@ -167,7 +167,7 @@ void ANetPawn::SetPlayerInput(FPlayerInputState newPlayerInputState)
 }
 
 
-void ANetPawn::Shoot()
+void ANetPawn::WeaponTrigger(bool isActive)
 {
 	if (!HasAuthority())
 	{
@@ -181,7 +181,7 @@ void ANetPawn::Shoot()
 		return;
 	}
 
-	myWeapon->Shoot();
+	myWeapon->Trigger(isActive);
 }
 
 void ANetPawn::BroadcastDamage_Implementation(int32 newHealth, int32 damage)

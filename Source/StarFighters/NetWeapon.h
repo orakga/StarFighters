@@ -21,7 +21,7 @@ public:
 
 	void SetWeaponParameters(int32 incomingID);
 
-	void Shoot();
+	void Trigger(bool isActive);
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ANetProjectile> projectileTemplate;
@@ -30,11 +30,43 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere)
+		bool isAutomatic = false;
+
+	UPROPERTY(EditAnywhere)
+		bool hasCooldown = false;
+
+	UPROPERTY(EditAnywhere)
+		float cooldownTime = 0.25f;
+
+	UPROPERTY(EditAnywhere)
+		bool canStoreCharges = false;
+
+	UPROPERTY(EditAnywhere)
+		float rechargeTime = 2.0f;
+
+	UPROPERTY(EditAnywhere)
+		int32 initialCharges = 0;
+
+	UPROPERTY(EditAnywhere)
+		int32 maxCharges = 5;
+
 private:
+
+	void CooldownManagement(float deltaTime);
+	bool IsReadyToShoot();
+	void Shoot();
 
 	UPrimitiveComponent* rootComp;
 	UWorld* theWorld;
 
 	int32 shooterID = -1;
+
+	bool isTriggerDown = false;
+
+	float timeSinceWeaponShot = 0.f;
+	float timeSinceRecharge = 0.f;
+
+	int32 chargesReady = 0;
 
 };

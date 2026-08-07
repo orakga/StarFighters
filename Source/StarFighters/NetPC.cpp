@@ -122,7 +122,19 @@ void ANetPC::SetupInputComponent()
 	SFInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ANetPC::Move);
 	SFInputComponent->BindAction(IA_Aim, ETriggerEvent::Triggered, this, &ANetPC::Aim);
 	SFInputComponent->BindAction(IA_MouseAim, ETriggerEvent::Triggered, this, &ANetPC::MouseAim);
-	SFInputComponent->BindAction(IA_Shoot, ETriggerEvent::Triggered, this, &ANetPC::Shoot);
+	// SFInputComponent->BindAction(IA_Shoot, ETriggerEvent::Triggered, this, &ANetPC::Shoot);
+	SFInputComponent->BindAction(IA_Shoot, ETriggerEvent::Started, this, &ANetPC::WeaponTrigger_On);
+	SFInputComponent->BindAction(IA_Shoot, ETriggerEvent::Completed, this, &ANetPC::WeaponTrigger_Off);
+}
+
+void ANetPC::WeaponTrigger_On()
+{
+	Server_WeaponTrigger(true);
+}
+
+void ANetPC::WeaponTrigger_Off()
+{
+	Server_WeaponTrigger(false);
 }
 
 void ANetPC::SetInputMappingContext(class UInputMappingContext* newIMC, FString newIMCmessage)
@@ -290,15 +302,16 @@ void ANetPC::MouseAim(const struct FInputActionInstance& Instance)
 }
 	
 
+/*
 void ANetPC::Shoot()
 {
 	// UE_LOG(LogTemp, Error, TEXT("ANetPC::Shoot() xxxxxxxxxxxxxxxxxxxxxxx | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
 
 	Server_Shoot();
 }
+*/
 
-
-void ANetPC::Server_Shoot_Implementation()
+void ANetPC::Server_WeaponTrigger_Implementation(bool isActive)
 {
 	if (!myShip.IsValid())
 	{
@@ -306,7 +319,7 @@ void ANetPC::Server_Shoot_Implementation()
 		return;
 	}
 
-	myShip->Shoot();
+	myShip->WeaponTrigger(isActive);
 }
 
 

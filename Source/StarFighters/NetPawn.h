@@ -46,7 +46,7 @@ public:
 	UPROPERTY(EditAnywhere)
 		int32 startingMaxHealth = 100;
 
-	void Shoot();
+	void WeaponTrigger(bool isActive);
 
 	int32 GetMyID() { return myShipID; }
 

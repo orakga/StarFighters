@@ -86,12 +86,14 @@ private:
 	void Move(const struct FInputActionInstance& Instance);
 	void Aim(const struct FInputActionInstance& Instance);
 	void MouseAim(const struct FInputActionInstance& Instance);
-	void Shoot();
+	// void Shoot();
+	void WeaponTrigger_On();
+	void WeaponTrigger_Off();
 
 	void DebugDisplay();
 
 	UFUNCTION(reliable, server)
-		void Server_Shoot();
+		void Server_WeaponTrigger(bool isActive);
 
 	UWorld* theWorld;
 	class ANetGameMode* theGameMode;
