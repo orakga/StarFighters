@@ -50,6 +50,14 @@ void ANetWeapon::Tick(float DeltaTime)
 
 }
 
+void ANetWeapon::EnableClientTick_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ANetWeapon::EnableClientTick() TICKING NOW ===== | % s"), *GetDebugName(this));
+
+	SetActorTickEnabled(true);
+}
+
+
 
 void ANetWeapon::SetWeaponParameters(int32 incomingID)
 {
@@ -118,7 +126,20 @@ void ANetWeapon::Shoot()
 		timeSinceWeaponShot = 0.f;
 	}
 
+	ClientCooldownReset(chargesReady);
 }
+
+
+void ANetWeapon::ClientCooldownReset_Implementation(int32 currentCharges)
+{
+	chargesReady = currentCharges;
+
+	if (hasCooldown && cooldownTime > 0.f)
+	{
+		timeSinceWeaponShot = 0.f;
+	}
+}
+
 
 void ANetWeapon::CooldownManagement(float deltaTime)
 {
@@ -131,7 +152,9 @@ void ANetWeapon::CooldownManagement(float deltaTime)
 
 			if (timeSinceWeaponShot >= cooldownTime)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("ANetWeapon::CooldownManagement() WEAPON READY | ID: % i | % s"), shooterID, *GetDebugName(this));
+				timeSinceWeaponShot = cooldownTime;
+
+				UE_LOG(LogTemp, Display, TEXT("ANetWeapon::CooldownManagement() WEAPON READY | ID: % i | % s"), shooterID, *GetDebugName(this));
 			}
 		}
 	}

@@ -4,6 +4,7 @@
 #include "NetPC.h"
 #include "NetGameMode.h"
 #include "NetPawn.h"
+#include "NetWeapon.h"
 #include "GameCamera.h"
 #include "GameFramework/PlayerState.h"
 #include "EnhancedInputComponent.h"
@@ -348,6 +349,20 @@ void ANetPC::AssignShipToPlayer()
 	AddSystemMessage(FString::Printf(TEXT("Your Ship is Ready!! =============")));
 }
 
+
+void ANetPC::RegisterWeapon_Implementation(class ANetWeapon* newWeapon)
+{
+	if (!newWeapon)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::RegisterWeapon() received INVALID weapon | %s"), *GetName());
+		return;
+	}
+
+	myWeapon = newWeapon;
+
+}
+
+
 void ANetPC::DestroyShip()
 {
 	UE_LOG(LogTemp, Warning, TEXT("ANetPC::DestroyShip() Player Name: %s (%s)"), *PlayerState->GetPlayerName(), *GetName());
@@ -372,6 +387,26 @@ void ANetPC::StartSpectating_Implementation()
 void ANetPC::DebugDisplay()
 {
 	FVector shipLocation = myShip->GetActorLocation();
+
+	// Draw COOLDOWN debugs ==========================================
+	if (myWeapon.IsValid())
+	{
+		float cooldownLeft = myWeapon->GetCooldownLeft();
+		int32 chargesLeft = myWeapon->GetCharges();
+		float timeToNextCharge = myWeapon->GetTimeToNextCharge();
+
+		DrawDebugString(
+			theWorld,
+			shipLocation + FVector(0.f, 0.f, -80.f),
+			FString::Printf(TEXT("%.2f | %d | %.1f"), cooldownLeft, chargesLeft, timeToNextCharge),
+			nullptr,
+			FColor::Yellow,
+			0.f,
+			true,
+			1.f		
+		);
+	}
+
 
 	// Draw MOVE debugs ==============================================
 	if (playerInputState.isMoveInputActive)

@@ -67,6 +67,9 @@ public:
 
 	void AssignShipToPlayer();
 
+	UFUNCTION(reliable, client)
+		void RegisterWeapon(class ANetWeapon* newWeapon);
+
 	void DestroyShip();
 
 private:
@@ -99,6 +102,7 @@ private:
 	class ANetGameMode* theGameMode;
 	// class ANetPawn* myShip;
 	TWeakObjectPtr<class ANetPawn> myShip;
+	TWeakObjectPtr<class ANetWeapon> myWeapon;
 	class AGameCamera* myCamera;
 
 	float timeBetweenInputUpdates = (float) 1 / (float) UserInputUpdateFrequency;

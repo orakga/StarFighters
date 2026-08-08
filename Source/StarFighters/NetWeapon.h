@@ -19,12 +19,19 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(reliable, client)
+		void EnableClientTick();
+
 	void SetWeaponParameters(int32 incomingID);
 
 	void Trigger(bool isActive);
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ANetProjectile> projectileTemplate;
+
+	float GetCooldownLeft() { return cooldownTime - timeSinceWeaponShot; }
+	int32 GetCharges() { return chargesReady; }
+	float GetTimeToNextCharge() { return rechargeTime - timeSinceRecharge; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -56,6 +63,9 @@ private:
 	void CooldownManagement(float deltaTime);
 	bool IsReadyToShoot();
 	void Shoot();
+
+	UFUNCTION(reliable, client)
+		void ClientCooldownReset(int32 currentCharges);
 
 	UPrimitiveComponent* rootComp;
 	UWorld* theWorld;

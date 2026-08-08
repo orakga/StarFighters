@@ -147,6 +147,9 @@ void ANetPawn::InitializeShip()
 		{
 			myWeapon->AttachToComponent(rootComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			myWeapon->SetWeaponParameters(myShipID);
+			myWeapon->SetOwner(this);
+			myWeapon->EnableClientTick();
+			Cast<ANetPC>(Controller)->RegisterWeapon(myWeapon);
 		}
 	}
 
@@ -379,7 +382,7 @@ void ANetPawn::DisplayHealth()
 {
 	DrawDebugString(
 		GetWorld(),
-		GetActorLocation() + FVector(-50, 0, 0),
+		GetActorLocation() + FVector(0, 0, -50),
 		FString::FromInt(health),
 		nullptr,
 		FColor::White,
