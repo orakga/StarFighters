@@ -84,6 +84,18 @@ void ANetWeapon::SetBarrel_Right(ANetWeaponBarrel* inBarrel)
 
 }
 
+void ANetWeapon::DestroyBarrels()
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	if (barrelLeft) barrelLeft->Destroy();
+	if (barrelRight) barrelRight->Destroy();
+
+}
+
 
 void ANetWeapon::SetWeaponParameters(int32 incomingID)
 {

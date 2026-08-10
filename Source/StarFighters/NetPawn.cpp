@@ -67,6 +67,23 @@ void ANetPawn::BeginPlay()
 
 }
 
+
+void ANetPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (HasAuthority())
+	{
+		if (myWeapon)
+		{
+			myWeapon->DestroyBarrels();
+			myWeapon->Destroy();
+		}
+	}
+
+	Super::EndPlay(EndPlayReason);
+
+}
+
+
 void ANetPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

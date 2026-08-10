@@ -30,6 +30,7 @@ public:
 
 	void SetBarrel_Left(class ANetWeaponBarrel* inBarrel);
 	void SetBarrel_Right(class ANetWeaponBarrel* inBarrel);
+	void DestroyBarrels();
 
 	TSubclassOf<class ANetWeaponBarrel> GetBarrelTemplate() { return barrelTemplate; }
 

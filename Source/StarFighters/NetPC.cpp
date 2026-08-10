@@ -376,6 +376,7 @@ void ANetPC::DestroyShip()
 void ANetPC::StartSpectating_Implementation()
 {
 	myShip.Reset();
+	myWeapon.Reset();
 	SetInputMappingContext(IMC_Spectating, TEXT("SPECTATING"));
 	myCamera->SpectatorMode();
 
