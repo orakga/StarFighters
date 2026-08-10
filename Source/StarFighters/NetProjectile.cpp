@@ -87,7 +87,7 @@ void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, 
 
 	if (!IsInitalized())
 	{
-		UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() This Projectile is NOT INITALIZED | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
+		// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() This Projectile is NOT INITALIZED | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
 		return;
 	}
 

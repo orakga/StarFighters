@@ -26,8 +26,18 @@ public:
 
 	void Trigger(bool isActive);
 
+	bool IsDualBarrel() { return isDualBarrel; }
+
+	void SetBarrel_Left(class ANetWeaponBarrel* inBarrel);
+	void SetBarrel_Right(class ANetWeaponBarrel* inBarrel);
+
+	TSubclassOf<class ANetWeaponBarrel> GetBarrelTemplate() { return barrelTemplate; }
+
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ANetProjectile> projectileTemplate;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ANetWeaponBarrel> barrelTemplate;
 
 	float GetCooldownLeft() { return cooldownTime - timeSinceWeaponShot; }
 	int32 GetCharges() { return chargesReady; }
@@ -36,6 +46,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere)
+		bool isDualBarrel = false;
 
 	UPROPERTY(EditAnywhere)
 		bool isAutomatic = false;
@@ -78,5 +91,13 @@ private:
 	float timeSinceRecharge = 0.f;
 
 	int32 chargesReady = 0;
+
+	class ANetWeaponBarrel* barrelLeft = nullptr;
+	class ANetWeaponBarrel* barrelRight = nullptr;
+
+	USceneComponent* muzzleLeft = nullptr;
+	USceneComponent* muzzleRight = nullptr;
+
+	bool bShootLeftNext = true;
 
 };

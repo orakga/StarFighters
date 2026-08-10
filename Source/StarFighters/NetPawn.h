@@ -104,6 +104,9 @@ private:
 		int32 maxHealth = 0;
 
 	class ANetWeapon* myWeapon;
+	USceneComponent* weaponBarrel_Solo;
+	USceneComponent* weaponBarrel_L;
+	USceneComponent* weaponBarrel_R;
 
 	float shipAcceleration = 10000;
 	float shipTurnSpeed = 180;

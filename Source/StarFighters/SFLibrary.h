@@ -26,7 +26,7 @@
 #define FixedCameraLocation FVector(-1000, 0, 1200)
 #define FixedCameraRotation FRotator(-45, 0, 0)
 
-#define ProjectileSpawnOffset 110
+// #define ProjectileSpawnOffset 110
 #define ProjectileAreaWidth 10000
 #define ProjectileAreaHeight 10000
 

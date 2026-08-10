@@ -3,6 +3,7 @@
 
 #include "NetWeapon.h"
 #include "NetProjectile.h"
+#include "NetWeaponBarrel.h"
 
 
 // Sets default values
@@ -57,6 +58,31 @@ void ANetWeapon::EnableClientTick_Implementation()
 	SetActorTickEnabled(true);
 }
 
+void ANetWeapon::SetBarrel_Left(ANetWeaponBarrel* inBarrel)
+{
+	if (!inBarrel)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetWeapon::SetBarrel_Left() INVALID Barrel Pointer | % s"), *GetDebugName(this));
+		return;
+	}
+
+	barrelLeft = inBarrel;
+	muzzleLeft = inBarrel->GetMuzzleComponent();
+
+}
+
+void ANetWeapon::SetBarrel_Right(ANetWeaponBarrel* inBarrel)
+{
+	if (!inBarrel)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetWeapon::SetBarrel_Right() INVALID Barrel Pointer | % s"), *GetDebugName(this));
+		return;
+	}
+
+	barrelRight = inBarrel;
+	muzzleRight = inBarrel->GetMuzzleComponent();
+
+}
 
 
 void ANetWeapon::SetWeaponParameters(int32 incomingID)
@@ -80,13 +106,13 @@ void ANetWeapon::Trigger(bool isActive)
 
 	if (isActive)  // Shoot button was JUST PRESSED
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ANetWeapon::Trigger() Shooter ID: % i | PRESSED | % s"), shooterID, *GetDebugName(this));
+		// UE_LOG(LogTemp, Warning, TEXT("ANetWeapon::Trigger() Shooter ID: % i | PRESSED | % s"), shooterID, *GetDebugName(this));
 
 		Shoot();
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("ANetWeapon::Trigger() Shooter ID: % i | RELEASED | % s"), shooterID, *GetDebugName(this));
+		// UE_LOG(LogTemp, Display, TEXT("ANetWeapon::Trigger() Shooter ID: % i | RELEASED | % s"), shooterID, *GetDebugName(this));
 	}
 
 }
@@ -111,10 +137,39 @@ void ANetWeapon::Shoot()
 		return;
 	}
 
-	ANetProjectile* spawnedProjectile = theWorld->SpawnActor<ANetProjectile>(projectileTemplate, rootComp->GetComponentLocation() + this->GetActorForwardVector() * ProjectileSpawnOffset, rootComp->GetComponentRotation(), FActorSpawnParameters());
+	// ========== DETERMINE Shot Location/Direction ======================
+
+	FVector muzzleLocation;
+	FRotator muzzleRotation;
+
+	if (bShootLeftNext)
+	{
+		if (muzzleLeft)
+		{
+			muzzleLocation = muzzleLeft->GetComponentLocation();
+			muzzleRotation = muzzleLeft->GetComponentRotation();
+		}
+	}
+	else
+	{
+		if (muzzleRight)
+		{
+			muzzleLocation = muzzleRight->GetComponentLocation();
+			muzzleRotation = muzzleRight->GetComponentRotation();
+		}
+	}
+
+	muzzleLocation = FVector(muzzleLocation.X, muzzleLocation.Y, 0); // FLATTEN location to Z = 0 plane
+
+	ANetProjectile* spawnedProjectile = theWorld->SpawnActor<ANetProjectile>(projectileTemplate, muzzleLocation, muzzleRotation, FActorSpawnParameters());
 	spawnedProjectile->SetProjectileParams(shooterID);
 
-	// ======================= RESET TIMERS + CHARGES ===========================
+	// ======================= POST-SPAWN clean-up ===========================
+
+	if (isDualBarrel)
+	{
+		bShootLeftNext = !bShootLeftNext;
+	}
 
 	if (canStoreCharges)
 	{
@@ -154,7 +209,7 @@ void ANetWeapon::CooldownManagement(float deltaTime)
 			{
 				timeSinceWeaponShot = cooldownTime;
 
-				UE_LOG(LogTemp, Display, TEXT("ANetWeapon::CooldownManagement() WEAPON READY | ID: % i | % s"), shooterID, *GetDebugName(this));
+				// UE_LOG(LogTemp, Display, TEXT("ANetWeapon::CooldownManagement() WEAPON READY | ID: % i | % s"), shooterID, *GetDebugName(this));
 			}
 		}
 	}
@@ -170,7 +225,7 @@ void ANetWeapon::CooldownManagement(float deltaTime)
 			chargesReady++;
 			timeSinceRecharge = 0;
 
-			UE_LOG(LogTemp, Warning, TEXT("ANetWeapon::CooldownManagement() CHARGE ADDED | ID: % i | % s | Charges: %d / %d"), shooterID, *GetDebugName(this), chargesReady, maxCharges);
+			// UE_LOG(LogTemp, Warning, TEXT("ANetWeapon::CooldownManagement() CHARGE ADDED | ID: % i | % s | Charges: %d / %d"), shooterID, *GetDebugName(this), chargesReady, maxCharges);
 		}
 	}
 }
