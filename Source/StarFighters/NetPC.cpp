@@ -124,18 +124,30 @@ void ANetPC::SetupInputComponent()
 	SFInputComponent->BindAction(IA_Aim, ETriggerEvent::Triggered, this, &ANetPC::Aim);
 	SFInputComponent->BindAction(IA_MouseAim, ETriggerEvent::Triggered, this, &ANetPC::MouseAim);
 	// SFInputComponent->BindAction(IA_Shoot, ETriggerEvent::Triggered, this, &ANetPC::Shoot);
-	SFInputComponent->BindAction(IA_Shoot, ETriggerEvent::Started, this, &ANetPC::WeaponTrigger_On);
-	SFInputComponent->BindAction(IA_Shoot, ETriggerEvent::Completed, this, &ANetPC::WeaponTrigger_Off);
+	SFInputComponent->BindAction(IA_Shoot1, ETriggerEvent::Started, this, &ANetPC::WeaponTrigger1_On);
+	SFInputComponent->BindAction(IA_Shoot1, ETriggerEvent::Completed, this, &ANetPC::WeaponTrigger1_Off);
+	SFInputComponent->BindAction(IA_Shoot2, ETriggerEvent::Started, this, &ANetPC::WeaponTrigger2_On);
+	SFInputComponent->BindAction(IA_Shoot2, ETriggerEvent::Completed, this, &ANetPC::WeaponTrigger2_Off);
 }
 
-void ANetPC::WeaponTrigger_On()
+void ANetPC::WeaponTrigger1_On()
 {
-	Server_WeaponTrigger(true);
+	Server_WeaponTrigger1(true);
 }
 
-void ANetPC::WeaponTrigger_Off()
+void ANetPC::WeaponTrigger1_Off()
 {
-	Server_WeaponTrigger(false);
+	Server_WeaponTrigger1(false);
+}
+
+void ANetPC::WeaponTrigger2_On()
+{
+	Server_WeaponTrigger2(true);
+}
+
+void ANetPC::WeaponTrigger2_Off()
+{
+	Server_WeaponTrigger2(false);
 }
 
 void ANetPC::SetInputMappingContext(class UInputMappingContext* newIMC, FString newIMCmessage)
@@ -312,7 +324,7 @@ void ANetPC::Shoot()
 }
 */
 
-void ANetPC::Server_WeaponTrigger_Implementation(bool isActive)
+void ANetPC::Server_WeaponTrigger1_Implementation(bool isActive)
 {
 	if (!myShip.IsValid())
 	{
@@ -320,9 +332,20 @@ void ANetPC::Server_WeaponTrigger_Implementation(bool isActive)
 		return;
 	}
 
-	myShip->WeaponTrigger(isActive);
+	myShip->WeaponTrigger1(isActive);
 }
 
+
+void ANetPC::Server_WeaponTrigger2_Implementation(bool isActive)
+{
+	if (!myShip.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::Server_Shoot() myShip is NOT VALID | Player Name: %s (PID: %d)"), *PlayerState->GetPlayerName(), PlayerState->GetPlayerId());
+		return;
+	}
+
+	myShip->WeaponTrigger2(isActive);
+}
 
 
 void ANetPC::AssignShipToPlayer()
@@ -350,7 +373,7 @@ void ANetPC::AssignShipToPlayer()
 }
 
 
-void ANetPC::RegisterWeapon_Implementation(class ANetWeapon* newWeapon)
+void ANetPC::RegisterWeapon1_Implementation(class ANetWeapon* newWeapon)
 {
 	if (!newWeapon)
 	{
@@ -358,7 +381,20 @@ void ANetPC::RegisterWeapon_Implementation(class ANetWeapon* newWeapon)
 		return;
 	}
 
-	myWeapon = newWeapon;
+	myWeapon1 = newWeapon;
+
+}
+
+
+void ANetPC::RegisterWeapon2_Implementation(class ANetWeapon* newWeapon)
+{
+	if (!newWeapon)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::RegisterWeapon() received INVALID weapon | %s"), *GetName());
+		return;
+	}
+
+	myWeapon2 = newWeapon;
 
 }
 
@@ -376,7 +412,8 @@ void ANetPC::DestroyShip()
 void ANetPC::StartSpectating_Implementation()
 {
 	myShip.Reset();
-	myWeapon.Reset();
+	myWeapon1.Reset();
+	myWeapon2.Reset();
 	SetInputMappingContext(IMC_Spectating, TEXT("SPECTATING"));
 	myCamera->SpectatorMode();
 
@@ -389,12 +426,16 @@ void ANetPC::DebugDisplay()
 {
 	FVector shipLocation = myShip->GetActorLocation();
 
-	// Draw COOLDOWN debugs ==========================================
-	if (myWeapon.IsValid())
+	float cooldownLeft;
+	int32 chargesLeft;
+	float timeToNextCharge;
+
+	// Draw COOLDOWN debugs: WEAPON 1 ==========================================
+	if (myWeapon1.IsValid())
 	{
-		float cooldownLeft = myWeapon->GetCooldownLeft();
-		int32 chargesLeft = myWeapon->GetCharges();
-		float timeToNextCharge = myWeapon->GetTimeToNextCharge();
+		cooldownLeft = myWeapon1->GetCooldownLeft();
+		chargesLeft = myWeapon1->GetCharges();
+		timeToNextCharge = myWeapon1->GetTimeToNextCharge();
 
 		DrawDebugString(
 			theWorld,
@@ -404,7 +445,26 @@ void ANetPC::DebugDisplay()
 			FColor::Yellow,
 			0.f,
 			true,
-			1.f		
+			1.f
+		);
+	}
+
+	// Draw COOLDOWN debugs: WEAPON 2 ==========================================
+	if (myWeapon2.IsValid())
+	{
+		cooldownLeft = myWeapon2->GetCooldownLeft();
+		chargesLeft = myWeapon2->GetCharges();
+		timeToNextCharge = myWeapon2->GetTimeToNextCharge();
+
+		DrawDebugString(
+			theWorld,
+			shipLocation + FVector(0.f, 0.f, -110.f),
+			FString::Printf(TEXT("%.2f | %d | %.1f"), cooldownLeft, chargesLeft, timeToNextCharge),
+			nullptr,
+			FColor::Green,
+			0.f,
+			true,
+			1.f
 		);
 	}
 

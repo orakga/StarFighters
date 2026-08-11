@@ -39,7 +39,10 @@ public:
 		// TSubclassOf<class ANetProjectile> projectileTemplate;
 
 	UPROPERTY(EditAnywhere)
-		TSubclassOf<class ANetWeapon> weapon_template;
+		TSubclassOf<class ANetWeapon> weapon_template_1;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ANetWeapon> weapon_template_2;
 
 	UPROPERTY(EditAnywhere)
 		int32 startingHealth = 100;
@@ -47,7 +50,8 @@ public:
 	UPROPERTY(EditAnywhere)
 		int32 startingMaxHealth = 100;
 
-	void WeaponTrigger(bool isActive);
+	void WeaponTrigger1(bool isActive);
+	void WeaponTrigger2(bool isActive);
 
 	int32 GetMyID() { return myShipID; }
 
@@ -104,10 +108,15 @@ private:
 	UPROPERTY(Replicated)
 		int32 maxHealth = 0;
 
-	class ANetWeapon* myWeapon;
-	USceneComponent* weaponBarrel_Solo;
-	USceneComponent* weaponBarrel_L;
-	USceneComponent* weaponBarrel_R;
+	class ANetWeapon* myWeapon1;
+	class ANetWeapon* myWeapon2;
+
+	USceneComponent* weapon1Barrel_Solo;
+	USceneComponent* weapon1Barrel_L;
+	USceneComponent* weapon1Barrel_R;
+	USceneComponent* weapon2Barrel_Solo;
+	USceneComponent* weapon2Barrel_L;
+	USceneComponent* weapon2Barrel_R;
 
 	float shipAcceleration = 10000;
 	float shipTurnSpeed = 180;

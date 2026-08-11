@@ -43,25 +43,46 @@ void ANetPawn::BeginPlay()
 
 	for (UActorComponent* Comp : myComponents)
 	{
-		// Find Barrel: SOLO =================
-		if (Comp->ComponentHasTag(TEXT("Barrel_Solo")))
+		// Find Barrel: SOLO 1 =================
+		if (Comp->ComponentHasTag(TEXT("Barrel1_Solo")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel_Solo | %s"), *GetDebugName(this));
-			weaponBarrel_Solo = (USceneComponent*)Comp;
+			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel1_Solo | %s"), *GetDebugName(this));
+			weapon1Barrel_Solo = (USceneComponent*)Comp;
 		}
 
-		// Find Barrel: LEFT =================
-		if (Comp->ComponentHasTag(TEXT("Barrel_L")))
+		// Find Barrel: LEFT 1 =================
+		if (Comp->ComponentHasTag(TEXT("Barrel1_L")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel_L | %s"), *GetDebugName(this));
-			weaponBarrel_L = (USceneComponent*)Comp;
+			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel1_L | %s"), *GetDebugName(this));
+			weapon1Barrel_L = (USceneComponent*)Comp;
 		}
 
-		// Find Barrel: RIGHT =================
-		if (Comp->ComponentHasTag(TEXT("Barrel_R")))
+		// Find Barrel: RIGHT 1 =================
+		if (Comp->ComponentHasTag(TEXT("Barrel1_R")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel_R | %s"), *GetDebugName(this));
-			weaponBarrel_R = (USceneComponent*)Comp;
+			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel1_R | %s"), *GetDebugName(this));
+			weapon1Barrel_R = (USceneComponent*)Comp;
+		}
+		
+		// Find Barrel: SOLO 2 =================
+		if (Comp->ComponentHasTag(TEXT("Barrel2_Solo")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel2_Solo | %s"), *GetDebugName(this));
+			weapon2Barrel_Solo = (USceneComponent*)Comp;
+		}
+
+		// Find Barrel: LEFT 2 =================
+		if (Comp->ComponentHasTag(TEXT("Barrel2_L")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel2_L | %s"), *GetDebugName(this));
+			weapon2Barrel_L = (USceneComponent*)Comp;
+		}
+
+		// Find Barrel: RIGHT 2 =================
+		if (Comp->ComponentHasTag(TEXT("Barrel2_R")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel2_R | %s"), *GetDebugName(this));
+			weapon2Barrel_R = (USceneComponent*)Comp;
 		}
 	}
 
@@ -72,10 +93,16 @@ void ANetPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (HasAuthority())
 	{
-		if (myWeapon)
+		if (myWeapon1)
 		{
-			myWeapon->DestroyBarrels();
-			myWeapon->Destroy();
+			myWeapon1->DestroyBarrels();
+			myWeapon1->Destroy();
+		}
+
+		if (myWeapon2)
+		{
+			myWeapon2->DestroyBarrels();
+			myWeapon2->Destroy();
 		}
 	}
 
@@ -171,104 +198,220 @@ void ANetPawn::InitializeShip()
 		return;
 	}
 
-	myShipID = Controller->PlayerState->GetPlayerId();
+		myShipID = Controller->PlayerState->GetPlayerId();
 	myShipName = Controller->PlayerState->GetPlayerName();
 	health = startingHealth;
 	maxHealth = startingMaxHealth;
-	
+
 	myGameplayAttributes->InitializeAttributes(myShipID, health, maxHealth);
 
-	if (!weapon_template)
+	TSubclassOf<ANetWeaponBarrel> barrelTemplate; // temporary container
+	ANetWeaponBarrel* spawnedBarrel; // temporary container
+
+	//  ==== WEAPON 1 : START ===========================================================================
+	#pragma region WEAPON 1
+
+	#pragma region W1 Spawning
+
+	if (!weapon_template_1)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon_template NOT SET | %s"), *GetDebugName(this));
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon_template_1 NOT SET | %s"), *GetDebugName(this));
 		return;
 	}
 
-	myWeapon = GetWorld()->SpawnActor<ANetWeapon>(weapon_template, FVector(), FRotator(), FActorSpawnParameters());
+	myWeapon1 = GetWorld()->SpawnActor<ANetWeapon>(weapon_template_1, FVector(), FRotator(), FActorSpawnParameters());
 
-	if (!myWeapon)
+	if (!myWeapon1)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED to spawn weapon | %s"), *GetDebugName(this));
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED to spawn weapon 1 | %s"), *GetDebugName(this));
 		return;
 	}
 
-	myWeapon->AttachToComponent(rootComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	myWeapon->SetWeaponParameters(myShipID);
+	myWeapon1->AttachToComponent(rootComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	myWeapon1->SetWeaponParameters(myShipID);
+
+	#pragma endregion
 
 	// === SPAWN and ATTACH barrels ==================================
+	#pragma region W1 Barrels
 
-	TSubclassOf<ANetWeaponBarrel> barrelTemplate = myWeapon->GetBarrelTemplate();
-	ANetWeaponBarrel* spawnedBarrel; // temporary container
+	barrelTemplate = myWeapon1->GetBarrelTemplate();
 
 	if (!barrelTemplate)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon has NO barrelTemplate | %s"), *GetDebugName(this));
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon 1 has NO barrelTemplate | %s"), *GetDebugName(this));
 		return;
 	}
 
-	if (myWeapon->IsDualBarrel())
+	if (myWeapon1->IsDualBarrel())
 	{
 		// Spawn LEFT barrel ===========================
-		if (!weaponBarrel_L)
+		if (!weapon1Barrel_L)
 		{
-			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weaponBarrel_L is NOT VALID | %s"), *GetDebugName(this));
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon1Barrel_L is NOT VALID | %s"), *GetDebugName(this));
 			return;
 		}
 
-		spawnedBarrel = GetWorld()->SpawnActor<ANetWeaponBarrel>(barrelTemplate, weaponBarrel_L->GetComponentTransform(), FActorSpawnParameters());
+		spawnedBarrel = GetWorld()->SpawnActor<ANetWeaponBarrel>(barrelTemplate, weapon1Barrel_L->GetComponentTransform(), FActorSpawnParameters());
 
 		if (!spawnedBarrel)
 		{
-			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED TO SPAWN for weaponBarrel_L | %s"), *GetDebugName(this));
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED TO SPAWN for weapon1Barrel_L | %s"), *GetDebugName(this));
 			return;
 		}
 
-		spawnedBarrel->AttachToComponent(weaponBarrel_L, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		myWeapon->SetBarrel_Left(spawnedBarrel);
+		spawnedBarrel->AttachToComponent(weapon1Barrel_L, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		myWeapon1->SetBarrel_Left(spawnedBarrel);
 
 		// Spawn RIGHT barrel ==========================
-		if (!weaponBarrel_R)
+		if (!weapon1Barrel_R)
 		{
-			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weaponBarrel_R is NOT VALID | %s"), *GetDebugName(this));
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon1Barrel_R is NOT VALID | %s"), *GetDebugName(this));
 			return;
 		}
 
-		spawnedBarrel = GetWorld()->SpawnActor<ANetWeaponBarrel>(barrelTemplate, weaponBarrel_R->GetComponentTransform(), FActorSpawnParameters());
+		spawnedBarrel = GetWorld()->SpawnActor<ANetWeaponBarrel>(barrelTemplate, weapon1Barrel_R->GetComponentTransform(), FActorSpawnParameters());
 
 		if (!spawnedBarrel)
 		{
-			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED TO SPAWN for weaponBarrel_R | %s"), *GetDebugName(this));
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED TO SPAWN for weapon1Barrel_R | %s"), *GetDebugName(this));
 			return;
 		}
 
-		spawnedBarrel->AttachToComponent(weaponBarrel_R, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		myWeapon->SetBarrel_Right(spawnedBarrel);
+		spawnedBarrel->AttachToComponent(weapon1Barrel_R, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		myWeapon1->SetBarrel_Right(spawnedBarrel);
 	}
 	else
 	{
 		// Spawn SOLO barrel ===========================
-		if (!weaponBarrel_Solo)
+		if (!weapon1Barrel_Solo)
 		{
-			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weaponBarrel_Solo is NOT VALID | %s"), *GetDebugName(this));
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon1Barrel_Solo is NOT VALID | %s"), *GetDebugName(this));
 			return;
 		}
 
-		spawnedBarrel = GetWorld()->SpawnActor<ANetWeaponBarrel>(barrelTemplate, weaponBarrel_Solo->GetComponentTransform(), FActorSpawnParameters());
+		spawnedBarrel = GetWorld()->SpawnActor<ANetWeaponBarrel>(barrelTemplate, weapon1Barrel_Solo->GetComponentTransform(), FActorSpawnParameters());
 
 		if (!spawnedBarrel)
 		{
-			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED TO SPAWN for weaponBarrel_Solo | %s"), *GetDebugName(this));
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED TO SPAWN for weapon1Barrel_Solo | %s"), *GetDebugName(this));
 			return;
 		}
 
-		spawnedBarrel->AttachToComponent(weaponBarrel_Solo, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		myWeapon->SetBarrel_Left(spawnedBarrel);
+		spawnedBarrel->AttachToComponent(weapon1Barrel_Solo, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		myWeapon1->SetBarrel_Left(spawnedBarrel);
 	}
 
+	#pragma endregion
 
-	myWeapon->SetOwner(this);
-	myWeapon->EnableClientTick();
-	Cast<ANetPC>(Controller)->RegisterWeapon(myWeapon);
+	myWeapon1->SetOwner(this);
+	myWeapon1->EnableClientTick();
+	Cast<ANetPC>(Controller)->RegisterWeapon1(myWeapon1);
+
+	#pragma endregion
+	//  ==== WEAPON 1 : END ===========================================================================
+
+	//  ==== WEAPON 2 : START ===========================================================================
+	#pragma region WEAPON 2
+
+	#pragma region W2 Spawning
+	if (!weapon_template_2)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon_template_2 NOT SET | %s"), *GetDebugName(this));
+		return;
+	}
+
+	myWeapon2 = GetWorld()->SpawnActor<ANetWeapon>(weapon_template_2, FVector(), FRotator(), FActorSpawnParameters());
+
+	if (!myWeapon2)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED to spawn weapon 2 | %s"), *GetDebugName(this));
+		return;
+	}
+
+	myWeapon2->AttachToComponent(rootComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	myWeapon2->SetWeaponParameters(myShipID);
+
+	#pragma endregion
+
+	// === SPAWN and ATTACH barrels ==================================
+	#pragma region W2 Barrels
+
+	barrelTemplate = myWeapon2->GetBarrelTemplate();
+
+	if (!barrelTemplate)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon 2 has NO barrelTemplate | %s"), *GetDebugName(this));
+		return;
+	}
+
+	if (myWeapon2->IsDualBarrel())
+	{
+		// Spawn LEFT barrel ===========================
+		if (!weapon2Barrel_L)
+		{
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon2Barrel_L is NOT VALID | %s"), *GetDebugName(this));
+			return;
+		}
+
+		spawnedBarrel = GetWorld()->SpawnActor<ANetWeaponBarrel>(barrelTemplate, weapon2Barrel_L->GetComponentTransform(), FActorSpawnParameters());
+
+		if (!spawnedBarrel)
+		{
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED TO SPAWN for weapon2Barrel_L | %s"), *GetDebugName(this));
+			return;
+		}
+
+		spawnedBarrel->AttachToComponent(weapon2Barrel_L, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		myWeapon2->SetBarrel_Left(spawnedBarrel);
+
+		// Spawn RIGHT barrel ==========================
+		if (!weapon2Barrel_R)
+		{
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon2Barrel_R is NOT VALID | %s"), *GetDebugName(this));
+			return;
+		}
+
+		spawnedBarrel = GetWorld()->SpawnActor<ANetWeaponBarrel>(barrelTemplate, weapon2Barrel_R->GetComponentTransform(), FActorSpawnParameters());
+
+		if (!spawnedBarrel)
+		{
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED TO SPAWN for weapon2Barrel_R | %s"), *GetDebugName(this));
+			return;
+		}
+
+		spawnedBarrel->AttachToComponent(weapon2Barrel_R, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		myWeapon2->SetBarrel_Right(spawnedBarrel);
+	}
+	else
+	{
+		// Spawn SOLO barrel ===========================
+		if (!weapon2Barrel_Solo)
+		{
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() weapon2Barrel_Solo is NOT VALID | %s"), *GetDebugName(this));
+			return;
+		}
+
+		spawnedBarrel = GetWorld()->SpawnActor<ANetWeaponBarrel>(barrelTemplate, weapon2Barrel_Solo->GetComponentTransform(), FActorSpawnParameters());
+
+		if (!spawnedBarrel)
+		{
+			UE_LOG(LogTemp, Error, TEXT("ANetPawn::InitializeShip() FAILED TO SPAWN for weapon2Barrel_Solo | %s"), *GetDebugName(this));
+			return;
+		}
+
+		spawnedBarrel->AttachToComponent(weapon2Barrel_Solo, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		myWeapon2->SetBarrel_Left(spawnedBarrel);
+	}
+
+	#pragma endregion
+
+	myWeapon2->SetOwner(this);
+	myWeapon2->EnableClientTick();
+	Cast<ANetPC>(Controller)->RegisterWeapon2(myWeapon2);
+
+	#pragma endregion
+	//  ==== WEAPON 2 : END ===========================================================================
 
 	isShipInitialized = true;
 
@@ -286,7 +429,7 @@ void ANetPawn::SetPlayerInput(FPlayerInputState newPlayerInputState)
 }
 
 
-void ANetPawn::WeaponTrigger(bool isActive)
+void ANetPawn::WeaponTrigger1(bool isActive)
 {
 	if (!HasAuthority())
 	{
@@ -294,13 +437,31 @@ void ANetPawn::WeaponTrigger(bool isActive)
 		return;
 	}
 
-	if (!myWeapon)
+	if (!myWeapon1)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ANetPawn::Shoot() Weapon is NOT VALID | ID: % i | % s"), myShipID, *GetDebugName(this));
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::Shoot() Weapon 1 is NOT VALID | ID: % i | % s"), myShipID, *GetDebugName(this));
 		return;
 	}
 
-	myWeapon->Trigger(isActive);
+	myWeapon1->Trigger(isActive);
+}
+
+
+void ANetPawn::WeaponTrigger2(bool isActive)
+{
+	if (!HasAuthority())
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::Shoot() Has to run AT SERVER | ID: % i | % s"), myShipID, *GetDebugName(this));
+		return;
+	}
+
+	if (!myWeapon2)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPawn::Shoot() Weapon 2 is NOT VALID | ID: % i | % s"), myShipID, *GetDebugName(this));
+		return;
+	}
+
+	myWeapon2->Trigger(isActive);
 }
 
 void ANetPawn::BroadcastDamage_Implementation(int32 newHealth, int32 damage)

@@ -55,9 +55,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UInputAction* IA_Aim;
+	
+	UPROPERTY(EditAnywhere)
+	class UInputAction* IA_Shoot1;
 
 	UPROPERTY(EditAnywhere)
-	class UInputAction* IA_Shoot;
+	class UInputAction* IA_Shoot2;
 
 	UPROPERTY(EditAnywhere)
 	class UInputAction* IA_MouseAim;
@@ -68,7 +71,10 @@ public:
 	void AssignShipToPlayer();
 
 	UFUNCTION(reliable, client)
-		void RegisterWeapon(class ANetWeapon* newWeapon);
+		void RegisterWeapon1(class ANetWeapon* newWeapon);
+
+	UFUNCTION(reliable, client)
+		void RegisterWeapon2(class ANetWeapon* newWeapon);
 
 	void DestroyShip();
 
@@ -90,19 +96,25 @@ private:
 	void Aim(const struct FInputActionInstance& Instance);
 	void MouseAim(const struct FInputActionInstance& Instance);
 	// void Shoot();
-	void WeaponTrigger_On();
-	void WeaponTrigger_Off();
+	void WeaponTrigger1_On();
+	void WeaponTrigger1_Off();
+	void WeaponTrigger2_On();
+	void WeaponTrigger2_Off();
 
 	void DebugDisplay();
 
 	UFUNCTION(reliable, server)
-		void Server_WeaponTrigger(bool isActive);
+		void Server_WeaponTrigger1(bool isActive);
+
+	UFUNCTION(reliable, server)
+		void Server_WeaponTrigger2(bool isActive);
 
 	UWorld* theWorld;
 	class ANetGameMode* theGameMode;
 	// class ANetPawn* myShip;
 	TWeakObjectPtr<class ANetPawn> myShip;
-	TWeakObjectPtr<class ANetWeapon> myWeapon;
+	TWeakObjectPtr<class ANetWeapon> myWeapon1;
+	TWeakObjectPtr<class ANetWeapon> myWeapon2;
 	class AGameCamera* myCamera;
 
 	float timeBetweenInputUpdates = (float) 1 / (float) UserInputUpdateFrequency;
