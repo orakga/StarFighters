@@ -91,6 +91,14 @@ public:
 
 	void AssignShipToPlayer();
 
+	UFUNCTION(BlueprintCallable)
+	void SetWeapon1( EWeaponType type );
+
+	UFUNCTION(BlueprintCallable)
+	void SetWeapon2( EWeaponType type );
+
+	TSubclassOf<class ANetWeapon> ResolveWeaponClass(EWeaponType type);
+
 	UFUNCTION(reliable, client)
 		void RegisterWeapon1(class ANetWeapon* newWeapon);
 
@@ -104,7 +112,7 @@ private:
 	void SpawnShip();
 
 	UFUNCTION(reliable, Server)
-		void Server_SpawnAndPossess();
+		void Server_SpawnAndPossess(EWeaponType weapon1Type, EWeaponType weapon2Type);
 
 	UFUNCTION(reliable, client)
 		void StartSpectating();
@@ -137,6 +145,9 @@ private:
 	TWeakObjectPtr<class ANetWeapon> myWeapon1;
 	TWeakObjectPtr<class ANetWeapon> myWeapon2;
 	class AGameCamera* myCamera;
+
+	EWeaponType selectedWeapon1 = EWeaponType::DefaultSolo;
+	EWeaponType selectedWeapon2 = EWeaponType::None;
 
 	float timeBetweenInputUpdates = (float) 1 / (float) UserInputUpdateFrequency;
 	float timeLeftToSendInput = 0;

@@ -35,6 +35,20 @@
 
 #define SelfDamageMultiplier 0.5
 
+// ENUMS ============================================================
+
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	DefaultSolo		UMETA(DisplayName = "Default (Solo)" ),
+	DefaultDual		UMETA(DisplayName = "Default (Dual)"),
+	DefaultDual2nd	UMETA(DisplayName = "Default (Dual - for 2nd Wpn)"),
+	Volt			UMETA(DisplayName = "Volt Rifle"),
+	Revolver		UMETA(DisplayName = "The Revolver"),
+	Ultimate		UMETA(DisplayName = "Ultimate Attack!!!"),
+	None			UMETA(DisplayName = "==== NO WEAPON ===="),
+};
+
 
 // STRUCTS ==========================================================
 

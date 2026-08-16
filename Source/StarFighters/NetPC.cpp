@@ -176,10 +176,10 @@ void ANetPC::SetInputMappingContext(class UInputMappingContext* newIMC, FString 
 void ANetPC::SpawnShip()
 {
 	UE_LOG(LogTemp, Error, TEXT("ANetPC::SpawnShip() | %s"), *GetName());
-	Server_SpawnAndPossess();
+	Server_SpawnAndPossess(selectedWeapon1, selectedWeapon2);
 }
 
-void ANetPC::Server_SpawnAndPossess_Implementation()
+void ANetPC::Server_SpawnAndPossess_Implementation(EWeaponType weapon1Type, EWeaponType weapon2Type)
 {
 	UE_LOG(LogTemp, Display, TEXT("ANetPC::Server_SpawnAndPossess() SPAWNING | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
 
@@ -211,7 +211,16 @@ void ANetPC::Server_SpawnAndPossess_Implementation()
 		return;
 	}
 
-	myShip->InitializeShip(weapon_template_3, weapon_template_BLANK);
+	TSubclassOf<ANetWeapon> loadoutWeaponClass1 = ResolveWeaponClass(weapon1Type);
+	TSubclassOf<ANetWeapon> loadoutWeaponClass2 = ResolveWeaponClass(weapon2Type);
+
+	if (!loadoutWeaponClass1 || !loadoutWeaponClass2)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ANetPC::Server_SpawnAndPossess() INVALID LOADOUTS | w1: %i | w2: %i | %s (PID: %d)"), weapon1Type, weapon2Type, *GetName(), PlayerState->GetPlayerId());
+		return;
+	}
+
+	myShip->InitializeShip(loadoutWeaponClass1, loadoutWeaponClass2);
 
 	if (GetPawn())
 	{
@@ -370,6 +379,51 @@ void ANetPC::AssignShipToPlayer()
 	SetInputMappingContext(IMC_Playing, "PLAYING");
 
 	AddSystemMessage(FString::Printf(TEXT("Your Ship is Ready!! =============")));
+}
+
+void ANetPC::SetWeapon1(EWeaponType type)
+{
+	selectedWeapon1 = type;
+	AddSystemMessage(FString::Printf(TEXT("ANetPC::SetWeapon1() %i | %s"), selectedWeapon1, *StaticEnum<EWeaponType>()->GetNameStringByValue(static_cast<int64>(selectedWeapon1))));
+}
+
+
+void ANetPC::SetWeapon2(EWeaponType type)
+{
+	selectedWeapon2 = type;
+	AddSystemMessage(FString::Printf(TEXT("ANetPC::SetWeapon2() %i | %s"), selectedWeapon2, *StaticEnum<EWeaponType>()->GetNameStringByValue(static_cast<int64>(selectedWeapon2))));
+}
+
+
+TSubclassOf<class ANetWeapon> ANetPC::ResolveWeaponClass(EWeaponType type)
+{
+	switch (type)
+	{
+		case EWeaponType::DefaultSolo:
+			return weapon_template_1;
+
+		case EWeaponType::DefaultDual:
+			return weapon_template_2;
+
+		case EWeaponType::DefaultDual2nd:
+			return weapon_template_3;
+
+		case EWeaponType::Volt:
+			return weapon_template_4;
+
+		case EWeaponType::Revolver:
+			return weapon_template_5;
+
+		case EWeaponType::Ultimate:
+			return weapon_template_6;
+
+		case EWeaponType::None:
+			return weapon_template_BLANK;
+
+		default:
+			UE_LOG(LogTemp, Error, TEXT("ANetPC::ResolveWeaponClass() INVALID weapon | %s"), *GetName());
+			return nullptr;
+	}
 }
 
 
