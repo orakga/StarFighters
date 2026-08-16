@@ -68,6 +68,27 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AGameCamera> camera_Template;
 
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ANetWeapon> weapon_template_1;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ANetWeapon> weapon_template_2;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ANetWeapon> weapon_template_3;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ANetWeapon> weapon_template_4;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ANetWeapon> weapon_template_5;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ANetWeapon> weapon_template_6;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ANetWeapon> weapon_template_BLANK;
+
 	void AssignShipToPlayer();
 
 	UFUNCTION(reliable, client)

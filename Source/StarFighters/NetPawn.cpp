@@ -182,7 +182,7 @@ void ANetPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void ANetPawn::InitializeShip()
+void ANetPawn::InitializeShip(TSubclassOf<class ANetWeapon> weapon_template_1, TSubclassOf<class ANetWeapon> weapon_template_2)
 {
 	UE_LOG(LogTemp, Display, TEXT("ANetPawn::InitializeShip() | %s"), *GetDebugName(this));
 
@@ -198,7 +198,7 @@ void ANetPawn::InitializeShip()
 		return;
 	}
 
-		myShipID = Controller->PlayerState->GetPlayerId();
+	myShipID = Controller->PlayerState->GetPlayerId();
 	myShipName = Controller->PlayerState->GetPlayerName();
 	health = startingHealth;
 	maxHealth = startingMaxHealth;

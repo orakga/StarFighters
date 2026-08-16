@@ -211,7 +211,7 @@ void ANetPC::Server_SpawnAndPossess_Implementation()
 		return;
 	}
 
-	myShip->InitializeShip();
+	myShip->InitializeShip(weapon_template_3, weapon_template_BLANK);
 
 	if (GetPawn())
 	{

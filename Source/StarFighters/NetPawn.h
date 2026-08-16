@@ -32,17 +32,17 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void SetLabel(int32 shipID, const FString& shipName);
 
-	void InitializeShip();
+	void InitializeShip(TSubclassOf<class ANetWeapon> weapon_template_1, TSubclassOf<class ANetWeapon> weapon_template_2);
 	void SetPlayerInput(FPlayerInputState newPlayerInputState);
 
 	// UPROPERTY(EditAnywhere)
 		// TSubclassOf<class ANetProjectile> projectileTemplate;
 
-	UPROPERTY(EditAnywhere)
-		TSubclassOf<class ANetWeapon> weapon_template_1;
+	// UPROPERTY(EditAnywhere)
+		// TSubclassOf<class ANetWeapon> weapon_template_1;
 
-	UPROPERTY(EditAnywhere)
-		TSubclassOf<class ANetWeapon> weapon_template_2;
+	// UPROPERTY(EditAnywhere)
+		// TSubclassOf<class ANetWeapon> weapon_template_2;
 
 	UPROPERTY(EditAnywhere)
 		int32 startingHealth = 100;

@@ -48,6 +48,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void Shoot();
+
+	int32 shooterID = -1;
+
 	UPROPERTY(EditAnywhere)
 		bool isDualBarrel = false;
 
@@ -76,15 +80,12 @@ private:
 
 	void CooldownManagement(float deltaTime);
 	bool IsReadyToShoot();
-	void Shoot();
 
 	UFUNCTION(reliable, client)
 		void ClientCooldownReset(int32 currentCharges);
 
 	UPrimitiveComponent* rootComp;
 	UWorld* theWorld;
-
-	int32 shooterID = -1;
 
 	bool isTriggerDown = false;
 
