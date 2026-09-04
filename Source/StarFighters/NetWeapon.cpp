@@ -53,7 +53,7 @@ void ANetWeapon::Tick(float DeltaTime)
 
 void ANetWeapon::EnableClientTick_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ANetWeapon::EnableClientTick() TICKING NOW ===== | % s"), *GetDebugName(this));
+	UE_LOG(LogTemp, Display, TEXT("ANetWeapon::EnableClientTick() TICKING NOW ===== | % s"), *GetDebugName(this));
 
 	SetActorTickEnabled(true);
 }

@@ -31,7 +31,7 @@ USceneComponent* ANetWeaponBarrel::GetMuzzleComponent()
 		// Find Barrel: SOLO =================
 		if (Comp->ComponentHasTag(TEXT("Muzzle")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ANetWeaponBarrel::GetMuzzleComponent() FOUND: Muzzle | %s"), *GetDebugName(this));
+			// UE_LOG(LogTemp, Warning, TEXT("ANetWeaponBarrel::GetMuzzleComponent() FOUND: Muzzle | %s"), *GetDebugName(this));
 			muzzleComponent = (USceneComponent*)Comp;
 			muzzleFound = true;
 			return muzzleComponent;

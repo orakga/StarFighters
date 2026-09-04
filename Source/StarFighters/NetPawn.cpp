@@ -46,42 +46,42 @@ void ANetPawn::BeginPlay()
 		// Find Barrel: SOLO 1 =================
 		if (Comp->ComponentHasTag(TEXT("Barrel1_Solo")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel1_Solo | %s"), *GetDebugName(this));
+			// UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel1_Solo | %s"), *GetDebugName(this));
 			weapon1Barrel_Solo = (USceneComponent*)Comp;
 		}
 
 		// Find Barrel: LEFT 1 =================
 		if (Comp->ComponentHasTag(TEXT("Barrel1_L")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel1_L | %s"), *GetDebugName(this));
+			// UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel1_L | %s"), *GetDebugName(this));
 			weapon1Barrel_L = (USceneComponent*)Comp;
 		}
 
 		// Find Barrel: RIGHT 1 =================
 		if (Comp->ComponentHasTag(TEXT("Barrel1_R")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel1_R | %s"), *GetDebugName(this));
+			// UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel1_R | %s"), *GetDebugName(this));
 			weapon1Barrel_R = (USceneComponent*)Comp;
 		}
 		
 		// Find Barrel: SOLO 2 =================
 		if (Comp->ComponentHasTag(TEXT("Barrel2_Solo")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel2_Solo | %s"), *GetDebugName(this));
+			// UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel2_Solo | %s"), *GetDebugName(this));
 			weapon2Barrel_Solo = (USceneComponent*)Comp;
 		}
 
 		// Find Barrel: LEFT 2 =================
 		if (Comp->ComponentHasTag(TEXT("Barrel2_L")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel2_L | %s"), *GetDebugName(this));
+			// UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel2_L | %s"), *GetDebugName(this));
 			weapon2Barrel_L = (USceneComponent*)Comp;
 		}
 
 		// Find Barrel: RIGHT 2 =================
 		if (Comp->ComponentHasTag(TEXT("Barrel2_R")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel2_R | %s"), *GetDebugName(this));
+			// UE_LOG(LogTemp, Warning, TEXT("ANetPawn::BeginPlay() FOUND: Barrel2_R | %s"), *GetDebugName(this));
 			weapon2Barrel_R = (USceneComponent*)Comp;
 		}
 	}
@@ -124,24 +124,24 @@ void ANetPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 
 void ANetPawn::OnRep_ShipID()
 {
-	UE_LOG(LogTemp, Display, TEXT("ANetPawn::OnRep_ShipID() ShipID: %d"), myShipID);
+	// UE_LOG(LogTemp, Display, TEXT("ANetPawn::OnRep_ShipID() ShipID: %d"), myShipID);
 }
 
 void ANetPawn::OnRep_ShipName()
 {
-	UE_LOG(LogTemp, Display, TEXT("ANetPawn::OnRep_ShipName() ShipName: %s"), *myShipName);
+	// UE_LOG(LogTemp, Display, TEXT("ANetPawn::OnRep_ShipName() ShipName: %s"), *myShipName);
 }
 
 void ANetPawn::OnRep_ShipInitialized()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ANetPawn::OnRep_ShipInitialized() myShipID = %d | myShipName = %s | %s"), myShipID, *myShipName, *GetDebugName(this));
+	UE_LOG(LogTemp, Display, TEXT("ANetPawn::OnRep_ShipInitialized() myShipID = %d | myShipName = %s | %s"), myShipID, *myShipName, *GetDebugName(this));
 
 	Cast<ANetPC>( GetWorld()->GetFirstPlayerController() )->AddSystemMessage(FString::Printf(TEXT("New Ship | ID: %i | Name: %s"), myShipID, *myShipName));
 
 	// Need to check for Controller to prevent OTHER clients from crashing
 	if (!Controller)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ANetPawn::OnRep_ShipInitialized() NOT CONTROLLED by this Client | %s"), *GetDebugName(this));
+		UE_LOG(LogTemp, Warning, TEXT("ANetPawn::OnRep_ShipInitialized() NOT CONTROLLED by this Client | %s"), *GetDebugName(this));
 		return;
 	}
 

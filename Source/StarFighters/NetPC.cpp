@@ -35,7 +35,7 @@ void ANetPC::BeginPlay()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ANetPC::BeginPlay() | PC Name: %s | NO PlayerState"), *GetName());
+		UE_LOG(LogTemp, Display, TEXT("ANetPC::BeginPlay() | PC Name: %s | NO PlayerState"), *GetName());
 	}
 
 	SetInputMappingContext(IMC_Spectating, "SPECTATING");
@@ -89,7 +89,7 @@ void ANetPC::Tick(float DeltaTime)
 
 void ANetPC::MessageToClient_Implementation(const FString& message)
 {
-	UE_LOG(LogTemp, Error, TEXT("ANetPC::MessageToClient() | %s"), *message);
+	UE_LOG(LogTemp, Warning, TEXT("ANetPC::MessageToClient() | %s"), *message);
 }
 
 void ANetPC::PostLoginInitialization_Implementation(int32 newPlayerID, const FString& newPlayerName, const FString& newServerName)
@@ -116,7 +116,7 @@ void ANetPC::SetupInputComponent()
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("ANetPC::SetupInputComponent() EnhancedInputComponent SECURED | %s"), *GetName());
+	UE_LOG(LogTemp, Display, TEXT("ANetPC::SetupInputComponent() EnhancedInputComponent SECURED | %s"), *GetName());
 
 	SFInputComponent->BindAction(IA_SpawnShip, ETriggerEvent::Triggered, this, &ANetPC::SpawnShip);
 	SFInputComponent->BindAction(IA_ReturnToMenu, ETriggerEvent::Triggered, this, &ANetPC::ReturnToMenu);
@@ -189,8 +189,7 @@ void ANetPC::Server_SpawnAndPossess_Implementation(EWeaponType weapon1Type, EWea
 		return;
 	}
 
-	// FVector spawnLocation = FVector(FMath::RandRange(-300, 500), FMath::RandRange(-1000,1000), 0);
-	FVector spawnLocation = FVector(FMath::RandRange(0, 0), FMath::RandRange(0, 0), 0);
+	FVector spawnLocation = FVector(FMath::RandRange(-300, 500), FMath::RandRange(-1000,1000), 0);
 
 	FTransform spawnTransform = FTransform(FRotator(), spawnLocation);
 	APawn* newShip = theGameMode->SpawnDefaultPawnAtTransform(this, spawnTransform);
@@ -201,7 +200,7 @@ void ANetPC::Server_SpawnAndPossess_Implementation(EWeaponType weapon1Type, EWea
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("ANetPC::Server_SpawnAndPossess() NEW SHIP SPAWNED! | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+	UE_LOG(LogTemp, Display, TEXT("ANetPC::Server_SpawnAndPossess() NEW SHIP SPAWNED! | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
 
 	Possess(newShip);
 
@@ -226,7 +225,7 @@ void ANetPC::Server_SpawnAndPossess_Implementation(EWeaponType weapon1Type, EWea
 
 	if (GetPawn())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ANetPC::Server_SpawnAndPossess() I HAVE A SHIP! OOOOOOOOOOOOO | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
+		// UE_LOG(LogTemp, Warning, TEXT("ANetPC::Server_SpawnAndPossess() I HAVE A SHIP! OOOOOOOOOOOOO | %s (PID: %d)"), *GetName(), PlayerState->GetPlayerId());
 	}
 	else
 	{

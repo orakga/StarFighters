@@ -31,7 +31,7 @@ void AMenuPC::JoinGame(FString serverIP, FString myPlayerName)
 {
 	FString serverURL = serverIP + ":7777" + "?PlayerName=" + myPlayerName;
 
-	UE_LOG(LogTemp, Error, TEXT("AMenuPC::BeginPlay() Traveling to : %s"), *serverURL);
+	UE_LOG(LogTemp, Warning, TEXT("AMenuPC::BeginPlay() Traveling to : %s"), *serverURL);
 	ClientTravel(serverURL, ETravelType::TRAVEL_Absolute);
 
 }

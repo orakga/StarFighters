@@ -53,7 +53,7 @@ void AGameCamera::SetTarget(class AActor* newTarget)
 	}
 
 	myTarget = newTarget;
-	UE_LOG(LogTemp, Warning, TEXT("AGameCamera::SetTarget() NEW TARGET: %s"), *myTarget->GetName());
+	UE_LOG(LogTemp, Display, TEXT("AGameCamera::SetTarget() NEW TARGET: %s"), *myTarget->GetName());
 }
 
 
