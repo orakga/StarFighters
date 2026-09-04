@@ -189,7 +189,9 @@ void ANetPC::Server_SpawnAndPossess_Implementation(EWeaponType weapon1Type, EWea
 		return;
 	}
 
-	FVector spawnLocation = FVector(FMath::RandRange(-300, 500), FMath::RandRange(-1000,1000), 0);
+	// FVector spawnLocation = FVector(FMath::RandRange(-300, 500), FMath::RandRange(-1000,1000), 0);
+	FVector spawnLocation = FVector(FMath::RandRange(0, 0), FMath::RandRange(0, 0), 0);
+
 	FTransform spawnTransform = FTransform(FRotator(), spawnLocation);
 	APawn* newShip = theGameMode->SpawnDefaultPawnAtTransform(this, spawnTransform);
 

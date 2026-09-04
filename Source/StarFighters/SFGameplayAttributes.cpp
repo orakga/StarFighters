@@ -19,6 +19,8 @@ USFGameplayAttributes::USFGameplayAttributes()
 // Called when the game starts
 void USFGameplayAttributes::BeginPlay()
 {
+	UE_LOG(LogTemp, Display, TEXT("USFGameplayAttributes::BeginPlay() %s"), *GetReadableName());
+
 	Super::BeginPlay();
 
 	myPawnPtr = Cast<ANetPawn>( GetOwner() );
@@ -42,6 +44,9 @@ void USFGameplayAttributes::InitializeAttributes(int32 newPlayerID, int32 initia
 	playerID = newPlayerID;
 	health = initialHealth;
 	maxHealth = initialMaxHealth;
+
+	isInitialized = true;
+	isAlive = true;
 }
 
 
@@ -49,6 +54,7 @@ void USFGameplayAttributes::ProcessDamage(int32 damage, int32 shooterID, AActor*
 {
 	// UE_LOG(LogTemp, Display, TEXT("USFGameplayAttributes::ProcessDamage() %s (%i) | Shooter: %s (%i) | Damage: %i | Health: %i "), *GetReadableName(), playerID, *damageSourceActor->GetHumanReadableName(), shooterID, damage, health);
 
+	if( !isInitialized ) return; // SAFETY CHECK: Cannot receive damage if SFGA hasn't been initialized
 	if( !isAlive ) return; // SAFETY CHECK
 
 	int32 damageTaken = damage;

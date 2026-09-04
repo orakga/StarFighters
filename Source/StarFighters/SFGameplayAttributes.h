@@ -31,9 +31,10 @@ private:
 	
 	TWeakObjectPtr<class ANetPawn> myPawnPtr;
 
-	int32 health = 0;
-	int32 maxHealth = 0;
-	int32 playerID = 0;
+	int32 health = 9999;
+	int32 maxHealth = 9999;
+	int32 playerID = -1;
 	bool isAlive = true;
+	bool isInitialized = false;
 	
 };
