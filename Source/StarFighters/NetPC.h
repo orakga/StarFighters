@@ -147,7 +147,7 @@ private:
 	class AGameCamera* myCamera;
 
 	EWeaponType selectedWeapon1 = EWeaponType::DefaultSolo;
-	EWeaponType selectedWeapon2 = EWeaponType::None;
+	EWeaponType selectedWeapon2 = EWeaponType::Rocket;
 
 	float timeBetweenInputUpdates = (float) 1 / (float) UserInputUpdateFrequency;
 	float timeLeftToSendInput = 0;

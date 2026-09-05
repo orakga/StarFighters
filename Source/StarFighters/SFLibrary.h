@@ -19,6 +19,7 @@
 
 #define UserInputUpdateFrequency 30
 #define ShipStateUpdateFrequency 10
+#define MissileTickFrequency 30
 
 #define ShipLinearDamping 0.5
 #define ShipAngularDamping 0.5
@@ -45,7 +46,7 @@ enum class EWeaponType : uint8
 	DefaultDual2nd	UMETA(DisplayName = "Default (Dual - for 2nd Wpn)"),
 	Volt			UMETA(DisplayName = "Volt Rifle"),
 	Revolver		UMETA(DisplayName = "The Revolver"),
-	Ultimate		UMETA(DisplayName = "Ultimate Attack!!!"),
+	Rocket			UMETA(DisplayName = "Rocket Launcher"),
 	None			UMETA(DisplayName = "==== NO WEAPON ===="),
 };
 

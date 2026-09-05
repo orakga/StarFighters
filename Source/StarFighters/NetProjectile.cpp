@@ -78,7 +78,25 @@ void ANetProjectile::Tick(float DeltaTime)
 
 	CheckForOutOfBounds();
 
+	Move(DeltaTime);
+
 }
+
+
+void ANetProjectile::Move(float DeltaTime)
+{
+	// By DEFAULT, a projectile doesn't have a special movement behavior
+
+}
+
+
+void ANetProjectile::DestroyProjectile()
+{
+	if(!HasAuthority()) return;
+
+	this->Destroy();
+}
+
 
 
 void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -164,7 +182,7 @@ void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, 
 		}
 		
 		BroadcastHit();
-		this->Destroy();
+		DestroyProjectile();
 	}
 	else
 	{
@@ -222,7 +240,7 @@ void ANetProjectile::CheckForOutOfBounds()
 			{
 				// Destroy the Projectile
 				// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::CheckForOutOfBounds() OUT OF BOUNDS | %s | %i / %i"), *GetName(), (int32) currentLocation.X, (int32) currentLocation.Y);
-				this->Destroy();
+				DestroyProjectile();
 			}
 		}
 	}

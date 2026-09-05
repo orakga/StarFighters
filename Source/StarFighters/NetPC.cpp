@@ -415,7 +415,7 @@ TSubclassOf<class ANetWeapon> ANetPC::ResolveWeaponClass(EWeaponType type)
 		case EWeaponType::Revolver:
 			return weapon_template_5;
 
-		case EWeaponType::Ultimate:
+		case EWeaponType::Rocket:
 			return weapon_template_6;
 
 		case EWeaponType::None:

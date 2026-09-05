@@ -7,6 +7,7 @@
 #include "NetWeapon.h"
 #include "NetWeaponBarrel.h"
 #include "SFGameplayAttributes.h"
+#include "Explosion.h"
 #include "DrawDebugHelpers.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -508,6 +509,13 @@ void ANetPawn::HandleDeath_Implementation()
 
 	if (HasAuthority()) // SERVER ==============
 	{
+		// SPAWN EXPLOSION
+		AExplosion* spawnedExplosion = GetWorld()->SpawnActor<AExplosion>(GetActorLocation(), FRotator(), FActorSpawnParameters());
+		if (spawnedExplosion)
+		{
+			spawnedExplosion->Detonate(200, 400, 50, 500, myShipID);
+		}
+
 		Destroy();
 	}
 	else // CLIENT ==================
