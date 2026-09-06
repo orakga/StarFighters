@@ -24,7 +24,7 @@ void ANetProjectile::BeginPlay()
 	
 	rootComp = (UPrimitiveComponent*)this->GetRootComponent();
 
-	SetActorTickInterval(0.1);
+	// SetActorTickInterval(0.1);
 
 	if (!rootComp)
 	{
@@ -91,7 +91,7 @@ void ANetProjectile::Move(float DeltaTime)
 }
 
 
-void ANetProjectile::DestroyProjectile()
+void ANetProjectile::DestroyProjectile( bool reachedTarget )
 {
 	if(!HasAuthority()) return;
 
@@ -213,7 +213,7 @@ void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, 
 		}
 		
 		BroadcastHit();
-		DestroyProjectile();
+		DestroyProjectile(true);
 	}
 	else
 	{
@@ -271,7 +271,7 @@ void ANetProjectile::CheckForOutOfBounds()
 			{
 				// Destroy the Projectile
 				// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::CheckForOutOfBounds() OUT OF BOUNDS | %s | %i / %i"), *GetName(), (int32) currentLocation.X, (int32) currentLocation.Y);
-				DestroyProjectile();
+				DestroyProjectile(false);
 			}
 		}
 	}

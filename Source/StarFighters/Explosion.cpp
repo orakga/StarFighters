@@ -91,6 +91,10 @@ void AExplosion::Detonate(float coreRadius, float outerRadius, int32 baseDamage,
 			directionToVictim.Normalize();
 			victimRoot->AddImpulse(directionToVictim * impactForce * falloff, NAME_None, true);
 
+			// If it's a MISSILE, for a quick NetSync now
+			ANetMissile* victimMissile = Cast<ANetMissile>(overlappedActor);
+			if(victimMissile) victimMissile->SetSyncTimer(0.1);
+
 			UE_LOG(LogTemp, Warning, TEXT("AExplosion::Detonate() impactFull: %.0f | fall: %.2f | impact: %.0f | %s -> %s"), impactForce, falloff, impactForce * falloff, *GetDebugName(this), *GetDebugName(overlappedActor));
 		}
 

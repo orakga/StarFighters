@@ -44,7 +44,7 @@ protected:
 
 	virtual void Move(float DeltaTime);
 
-	virtual void DestroyProjectile();
+	virtual void DestroyProjectile(bool reachedTarget);
 
 	UFUNCTION()
 		void OverlapDetected(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

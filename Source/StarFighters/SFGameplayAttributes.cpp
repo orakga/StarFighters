@@ -140,7 +140,7 @@ void USFGameplayAttributes::ProcessDamage(int32 damage, int32 shooterID, AActor*
 			ANetMissile* myMissile = myMissilePtr.Get();
 			if (myMissile)
 			{
-				myMissile->DestroyProjectile();
+				myMissile->DestroyProjectile(false);
 			}
 		}
 

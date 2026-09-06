@@ -20,14 +20,18 @@ void ANetMissile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetActorTickInterval( (float) 1 / (float) MissileTickFrequency );
+	// SetActorTickInterval((float)1 / (float)MissileTickFrequency);
 }
 
 void ANetMissile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!HasAuthority())
+	if (HasAuthority())
+	{
+		ManageNetSync(DeltaTime);
+	}
+	else
 	{
 		DisplayHealth();
 	}
@@ -77,22 +81,77 @@ void ANetMissile::Move(float DeltaTime)
 
 	FVector currentVelocity = rootComp->GetPhysicsLinearVelocity();
 
+	SetActorRotation(currentVelocity.Rotation());
+
+
 	if (currentVelocity.Size() < maxSpeed)
 	{
 		rootComp->AddForce( GetActorForwardVector() * thrust, NAME_None, true );
+	}
+	else if (currentVelocity.Size() > maxSpeed * 1.2) // if the missile is MORE THAN 20% FASTER than the MAX SPEED
+	{
+		// UE_LOG(LogTemp, Warning, TEXT("ANetMissile::Move() SLOW DOWN =====  %f / %f | %s"), currentVelocity.Size(), maxSpeed, *GetDebugName(this));
+		rootComp->SetPhysicsLinearVelocity(currentVelocity * ( 1 - DeltaTime * 0.2f));
 	}
 
 	// UE_LOG(LogTemp, Display, TEXT("ANetMissile::Move() %f / %f | %s"), currentVelocity.Size(), maxSpeed, *GetDebugName(this));
 }
 
 
-void ANetMissile::DestroyProjectile()
+void ANetMissile::ManageNetSync(float DeltaTime)
 {
-	AExplosion* spawnedExplosion = GetWorld()->SpawnActor<AExplosion>(GetActorLocation(), FRotator(), FActorSpawnParameters());
-	if(spawnedExplosion) spawnedExplosion->Detonate(coreRadius, outerRadius, baseExplosionDamage, explosionImpactForce, myShooterID);
+	timeLeftToSync -= DeltaTime;
+	if (timeLeftToSync <= 0)
+	{
+		Multicast_BroadcastState(GetActorLocation(), GetActorRotation(), rootComp->GetPhysicsLinearVelocity());
+
+		timeLeftToSync += (float)1 / (float) MissileSyncFrequency;
+
+		UE_LOG(LogTemp, Display, TEXT("ANetMissile::ManageNetSync() SYNCED | %s"), *GetDebugName(this));
+	}
+
+	missileLifespan -= DeltaTime;
+	if (missileLifespan <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ANetMissile::ManageNetSync() Missile EXPIRED | %s"), *GetDebugName(this));
+
+		DestroyProjectile(false);
+	}
+}
 
 
-	Super::DestroyProjectile();
+void ANetMissile::Multicast_BroadcastState_Implementation(FVector Location, FRotator Rotation, FVector Velocity)
+{
+	// TECH DEBT: ROTATION can be compressed to HEADING instead ======================
+
+	if(HasAuthority()) return;
+
+	if (rootComp)
+	{
+		SetActorLocationAndRotation(Location, Rotation);
+		rootComp->SetAllPhysicsLinearVelocity(Velocity);
+	}
+
+}
+
+
+void ANetMissile::DestroyProjectile(bool reachedTarget)
+{
+	if (reachedTarget)
+	{
+		// Spawn FULL explosion
+		AExplosion* spawnedExplosion = GetWorld()->SpawnActor<AExplosion>(GetActorLocation(), FRotator(), FActorSpawnParameters());
+		if (spawnedExplosion) spawnedExplosion->Detonate(coreRadius, outerRadius, baseExplosionDamage, explosionImpactForce, myShooterID);
+	}
+	else
+	{
+		// Spawn SMALLER explosion
+		AExplosion* spawnedExplosion = GetWorld()->SpawnActor<AExplosion>(GetActorLocation(), FRotator(), FActorSpawnParameters());
+		if (spawnedExplosion) spawnedExplosion->Detonate(coreRadius_small, outerRadius_small, baseExplosionDamage_small, explosionImpactForce_small, myShooterID);
+
+	}
+
+	Super::DestroyProjectile(reachedTarget);
 }
 
 

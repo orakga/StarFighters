@@ -21,7 +21,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void SetProjectileParams(int32 shooterID) override;
-	virtual void DestroyProjectile() override;
+	virtual void DestroyProjectile(bool reachedTarget) override;
+	void SetSyncTimer(float nextSyncTime) { timeLeftToSync = nextSyncTime; }
 
 	UFUNCTION(NetMulticast, Reliable)
 		void BroadcastDamage(int32 newHealth, int32 damage);
@@ -29,7 +30,11 @@ public:
 protected:
 
 	virtual void Move(float DeltaTime) override;
+	virtual void ManageNetSync(float DeltaTime); // New, MISSILE-specific net-sync function
 	
+	UFUNCTION(NetMulticast, Unreliable)
+		void Multicast_BroadcastState(FVector Location, FRotator Rotation, FVector Velocity);
+
 	void DisplayHealth();
 
 	UPROPERTY(EditAnywhere)
@@ -49,6 +54,21 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 		float explosionImpactForce = 500;
+	
+	UPROPERTY(EditAnywhere)
+		float coreRadius_small = 100;
+	
+	UPROPERTY(EditAnywhere)
+		float outerRadius_small = 200;
+	
+	UPROPERTY(EditAnywhere)
+		float baseExplosionDamage_small = 20;
+	
+	UPROPERTY(EditAnywhere)
+		float explosionImpactForce_small = 200;
+			
+	UPROPERTY(EditAnywhere)
+		float missileLifespan = 30.0f;
 
 	UPROPERTY(Replicated, EditAnywhere)
 		int32 health = 10;
@@ -58,5 +78,6 @@ protected:
 
 	class USFGameplayAttributes* myGameplayAttributes;
 
-	
+	float timeLeftToSync = 0.1f;
+
 };
