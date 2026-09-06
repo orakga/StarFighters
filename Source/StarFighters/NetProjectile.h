@@ -26,6 +26,12 @@ private:
 	UPROPERTY(EditAnywhere)
 		bool canSelfDamage = false;
 
+	UPROPERTY(EditAnywhere)
+		bool canDmgProjectiles = false;
+
+	UPROPERTY(EditAnywhere)
+		bool canDmgMissiles = false;
+
 	bool projectileInitialized = false;
 
 protected:
@@ -54,7 +60,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	int32 GetMyShooterID() { return myShooterID; }
-	void SetProjectileParams(int32 shooterID);
+	virtual void SetProjectileParams(int32 shooterID);
 	bool IsInitalized() { return projectileInitialized;}
 	
 	UPROPERTY(EditAnywhere)

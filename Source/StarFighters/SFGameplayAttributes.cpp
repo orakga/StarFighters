@@ -3,6 +3,7 @@
 
 #include "SFGameplayAttributes.h"
 #include "NetPawn.h"
+#include "NetMissile.h"
 
 
 // Sets default values for this component's properties
@@ -24,6 +25,13 @@ void USFGameplayAttributes::BeginPlay()
 	Super::BeginPlay();
 
 	myPawnPtr = Cast<ANetPawn>( GetOwner() );
+	myMissilePtr = Cast<ANetMissile>( GetOwner() );
+
+	if( !myPawnPtr.IsValid() && !myMissilePtr.IsValid() )
+	{
+		UE_LOG(LogTemp, Error, TEXT("USFGameplayAttributes::BeginPlay() OWNER NOT RECOGNIZED"), *GetReadableName());
+	}
+
 	
 }
 
@@ -83,7 +91,7 @@ void USFGameplayAttributes::ProcessDamage(int32 damage, int32 shooterID, AActor*
 	// ========== IF DAMAGE was done, UPDATE at OWNER ===============
 	if (damageTaken != 0)
 	{
-		// If victim was A PAWN ==============================
+		// PAWN ==============================
 		if (myPawnPtr.IsValid())
 		{
 			ANetPawn* myPawn = myPawnPtr.Get();
@@ -93,17 +101,30 @@ void USFGameplayAttributes::ProcessDamage(int32 damage, int32 shooterID, AActor*
 			}
 		}
 
+		// MISSILE ==============================
+		if (myMissilePtr.IsValid())
+		{
+			ANetMissile* myMissile = myMissilePtr.Get();
+			if (myMissile)
+			{
+				myMissile->BroadcastDamage(health, damageTaken);
+			}
+		}
+
+
+
 		// ADD HERE for NEW TYPES ============================
 		// ......
 
 	}
 
+	// ========== IF OWNER is DEAD, initiate DEATH processing ===============
 	if (health <= 0)
 	{
 		UE_LOG(LogTemp, Error, TEXT("USFGameplayAttributes::ProcessDamage() %s (%i) | Shooter: %s (%i) | THIS ACTOR IS DEAD"), *GetReadableName(), playerID, *damageSourceActor->GetHumanReadableName(), shooterID);
 		isAlive = false;
 
-		// If victim was A PAWN ==============================
+		// PAWN ==============================
 		if (myPawnPtr.IsValid())
 		{
 			ANetPawn* myPawn = myPawnPtr.Get();
@@ -112,6 +133,17 @@ void USFGameplayAttributes::ProcessDamage(int32 damage, int32 shooterID, AActor*
 				myPawn->DestroyMe();
 			}
 		}
+
+		// MISSILE ==============================
+		if (myMissilePtr.IsValid())
+		{
+			ANetMissile* myMissile = myMissilePtr.Get();
+			if (myMissile)
+			{
+				myMissile->DestroyProjectile();
+			}
+		}
+
 
 		// ADD HERE for NEW TYPES ============================
 		// ......

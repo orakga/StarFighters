@@ -30,6 +30,7 @@ public:
 private:
 	
 	TWeakObjectPtr<class ANetPawn> myPawnPtr;
+	TWeakObjectPtr<class ANetMissile> myMissilePtr;
 
 	int32 health = 9999;
 	int32 maxHealth = 9999;

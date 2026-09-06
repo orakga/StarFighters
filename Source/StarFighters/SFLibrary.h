@@ -35,6 +35,7 @@
 #define AimInputDeadzone 0.5
 
 #define SelfDamageMultiplier 0.5
+#define BlastDamageToMissileMultiplier 0.2
 
 // ENUMS ============================================================
 

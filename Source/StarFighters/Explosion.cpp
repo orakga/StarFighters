@@ -4,6 +4,7 @@
 #include "Explosion.h"
 #include "SFGameplayAttributes.h"
 #include "NetPawn.h"
+#include "NetMissile.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "DrawDebugHelpers.h"
 
@@ -69,6 +70,9 @@ void AExplosion::Detonate(float coreRadius, float outerRadius, int32 baseDamage,
 				// Calculate HOW MUCH DAMAGE it should receive
 				int32 damageToApply = (int32) ((float) baseDamage * falloff);
 
+				// If it's a MISSILE, reduce the damage
+				if(Cast<ANetMissile>(overlappedActor)) damageToApply = (int32) ( (float) damageToApply * BlastDamageToMissileMultiplier  );
+
 				// APPLY Damage
 				victimAttributes->ProcessDamage(damageToApply, shooterID, this);
 
@@ -109,6 +113,12 @@ bool AExplosion::IsDamageTarget(AActor* actorToCheck)
 	{
 		return true;
 	}
+
+	if (Cast<ANetMissile>(actorToCheck))
+	{
+		return true;
+	}
+
 
 	// == ADD NEW Actor Types Here ===========================
 

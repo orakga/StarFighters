@@ -3,6 +3,7 @@
 
 #include "NetProjectile.h"
 #include "NetPawn.h"
+#include "NetMissile.h"
 #include "SFGameplayAttributes.h"
 #include "DrawDebugHelpers.h"
 
@@ -144,7 +145,7 @@ void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, 
 			if (myShooterID != otherProjectile->GetMyShooterID()) // Is this MY OWN projectile or not?
 			{
 				// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's an ENEMY PROJECTILE! | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherProjectile->GetMyShooterID());
-				isValidHit = true;
+				isValidHit = canDmgProjectiles;
 			}
 			else
 			{
@@ -163,6 +164,36 @@ void ANetProjectile::OverlapDetected(class UPrimitiveComponent* OverlappedComp, 
 		// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's NOT A PROJECTILE | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
 	}
 
+
+	// Test if the other Actor was a MISSILE
+	ANetMissile* otherMissile = Cast<ANetMissile>(OtherActor);
+	if (otherMissile)
+	{
+		// UE_LOG(LogTemp, Warning, TEXT("ANetProjectile::OverlapDetected() It's a MISSILE | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
+
+		if (otherMissile->IsInitalized())
+		{
+			if (myShooterID != otherMissile->GetMyShooterID()) // Is this MY OWN projectile or not?
+			{
+				// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's an ENEMY MISSILE! | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherProjectile->GetMyShooterID());
+				isValidHit = canDmgMissiles;
+			}
+			else
+			{
+				// UE_LOG(LogTemp, Warning, TEXT("ANetProjectile::OverlapDetected() It's MY MISSILE | %s (%i) | Actor: %s (%i)"), *GetName(), myShooterID, *OtherActor->GetName(), otherProjectile->GetMyShooterID());
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() The other Missile is NOT INITALIZED | %s | Actor: %s | Comp: %s "), *GetName(), *OtherActor->GetName(), *OtherComp->GetName());
+		}
+
+
+	}
+	else
+	{
+		// UE_LOG(LogTemp, Display, TEXT("ANetProjectile::OverlapDetected() It's NOT A Missile | %s | Actor: %s"), *GetName(), *OtherActor->GetName());
+	}
 
 	// Check if there was a Valid Hit found
 	if (isValidHit)

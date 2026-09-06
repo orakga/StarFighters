@@ -16,14 +16,22 @@ class STARFIGHTERS_API ANetMissile : public ANetProjectile
 
 public:
 
+	ANetMissile();
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void SetProjectileParams(int32 shooterID) override;
+	virtual void DestroyProjectile() override;
+
+	UFUNCTION(NetMulticast, Reliable)
+		void BroadcastDamage(int32 newHealth, int32 damage);
 
 protected:
 
 	virtual void Move(float DeltaTime) override;
-
-	virtual void DestroyProjectile() override;
 	
+	void DisplayHealth();
+
 	UPROPERTY(EditAnywhere)
 		float thrust = 0;
 
@@ -41,6 +49,14 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 		float explosionImpactForce = 500;
+
+	UPROPERTY(Replicated, EditAnywhere)
+		int32 health = 10;
+
+	UPROPERTY(Replicated)
+		int32 maxHealth;
+
+	class USFGameplayAttributes* myGameplayAttributes;
 
 	
 };
