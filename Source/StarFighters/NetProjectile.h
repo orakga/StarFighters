@@ -24,9 +24,6 @@ private:
 		int32 projectileDamage = 10;
 
 	UPROPERTY(EditAnywhere)
-		bool canSelfDamage = false;
-
-	UPROPERTY(EditAnywhere)
 		bool canDmgProjectiles = false;
 
 	UPROPERTY(EditAnywhere)
@@ -51,7 +48,11 @@ protected:
 
 	UFUNCTION(reliable, NetMulticast)
 		void BroadcastHit();
+		
+	UPROPERTY(EditAnywhere)
+		bool canSelfDamage = false;
 
+	UWorld* theWorld = nullptr;
 	UPrimitiveComponent* rootComp;
 
 	int32 myShooterID = -1;

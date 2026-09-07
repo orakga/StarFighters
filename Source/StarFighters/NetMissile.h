@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "NetProjectile.h"
+#include "Engine/OverlapResult.h"
 #include "NetMissile.generated.h"
 
 /**
@@ -35,7 +36,21 @@ protected:
 	UFUNCTION(NetMulticast, Unreliable)
 		void Multicast_BroadcastState(FVector Location, FRotator Rotation, FVector Velocity);
 
+	// DEBUGGING ONLY ============================
+	UFUNCTION(NetMulticast, Unreliable)
+		void Multicast_BroadcastScanResult(FVector Location, float size, FColor color);
+
+	void ScanForTarget();
+	bool IsValidHomingTarget(AActor* potentialTarget);
+	bool IsInsideSensorArea(AActor* potentialTarget);
+
 	void DisplayHealth();
+
+	UPROPERTY(EditAnywhere)
+		bool isHoming = false;
+
+	UPROPERTY(EditAnywhere)
+		bool tracksMissile = false;
 
 	UPROPERTY(EditAnywhere)
 		float thrust = 0;
@@ -43,6 +58,12 @@ protected:
 	UPROPERTY(EditAnywhere)
 		float maxSpeed = 200;
 	
+	UPROPERTY(EditAnywhere)
+		float sensorRange = 1000;
+
+	UPROPERTY(EditAnywhere)
+		float sensorConeAngle = 60.f;
+
 	UPROPERTY(EditAnywhere)
 		float coreRadius = 200;
 	
@@ -77,6 +98,12 @@ protected:
 		int32 maxHealth;
 
 	class USFGameplayAttributes* myGameplayAttributes;
+	UPrimitiveComponent* triggerComp = nullptr;
+	FCollisionObjectQueryParams scanObjectParams;
+	FComponentQueryParams scanComponentParams;
+	TArray<FOverlapResult> scanResults;
+
+	bool targetAcquired = false;
 
 	float timeLeftToSync = 0.1f;
 

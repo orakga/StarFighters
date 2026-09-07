@@ -21,7 +21,8 @@ ANetProjectile::ANetProjectile()
 void ANetProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	theWorld = GetWorld();
 	rootComp = (UPrimitiveComponent*)this->GetRootComponent();
 
 	// SetActorTickInterval(0.1);
@@ -244,10 +245,9 @@ void ANetProjectile::BroadcastHit_Implementation()
 		return;
 	}
 
-	this->GetWorld()->SpawnActor<AActor>(hitFX_template, rootComp->GetComponentLocation(), FRotator(), FActorSpawnParameters());
+	theWorld->SpawnActor<AActor>(hitFX_template, rootComp->GetComponentLocation(), FRotator(), FActorSpawnParameters());
 
 	// === DEBUG LINE to show LOCATION + DIRECTION of HIT =================
-	UWorld* theWorld = GetWorld();
 	DrawDebugLine(theWorld, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 15.f, FColor::Red, false, 5.f, 0, 8.f);
 	DrawDebugLine(theWorld, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 40.f, FColor::Red, false, 5.f, 0, 3.f);
 

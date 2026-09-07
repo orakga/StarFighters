@@ -23,3 +23,14 @@ float SFLibrary::BoundHeadingAngle(float inHeading)
 	return inHeading;
 
 }
+
+
+float SFLibrary::GetAngleBetweenVectors(FVector vector1, FVector vector2)
+{
+	vector1.Normalize();
+	vector2.Normalize();
+
+	float dotCalculated = FMath::Clamp( FVector::DotProduct(vector1, vector2), -1.f, 1.f);
+
+	return FMath::RadiansToDegrees( FMath::Acos(dotCalculated) );
+}
