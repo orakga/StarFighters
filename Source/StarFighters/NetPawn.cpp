@@ -577,7 +577,7 @@ void ANetPawn::Move(float DeltaTime)
 	float headingRadians = FMath::DegreesToRadians(playerInputState.moveHeading);
 	FVector accelVector = FVector( FMath::Cos(headingRadians), FMath::Sin(headingRadians), 0);
 
-	rootComp->AddForce(accelVector * DeltaTime * shipAcceleration, NAME_None, true);
+	rootComp->AddForce(accelVector * shipAcceleration, NAME_None, true);
 }
 
 

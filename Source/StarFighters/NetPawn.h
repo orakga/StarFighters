@@ -118,7 +118,7 @@ private:
 	USceneComponent* weapon2Barrel_L;
 	USceneComponent* weapon2Barrel_R;
 
-	float shipAcceleration = 10000;
+	float shipAcceleration = 800;
 	float shipTurnSpeed = 180;
 	float currentHeading;
 	float targetHeading = 0;

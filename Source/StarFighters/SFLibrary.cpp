@@ -34,3 +34,11 @@ float SFLibrary::GetAngleBetweenVectors(FVector vector1, FVector vector2)
 
 	return FMath::RadiansToDegrees( FMath::Acos(dotCalculated) );
 }
+
+
+float SFLibrary::GetHeadingFromDirection(FVector direction)
+{
+	direction.Z = 0.f; // FLATTEN along Z-axis
+	
+	return BoundHeadingAngle( direction.Rotation().Yaw ); // ANGLE
+}

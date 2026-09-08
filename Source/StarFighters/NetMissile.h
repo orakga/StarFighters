@@ -44,6 +44,10 @@ protected:
 	bool IsValidHomingTarget(AActor* potentialTarget);
 	bool IsInsideSensorArea(AActor* potentialTarget);
 
+	void AcquireTarget(AActor* newTarget);
+	void ChaseTarget(float DeltaTime);
+	void DropTarget();
+
 	void DisplayHealth();
 
 	UPROPERTY(EditAnywhere)
@@ -53,11 +57,20 @@ protected:
 		bool tracksMissile = false;
 
 	UPROPERTY(EditAnywhere)
-		float thrust = 0;
+		float normal_Thrust = 150;
 
 	UPROPERTY(EditAnywhere)
-		float maxSpeed = 200;
+		float normal_MaxSpeed = 200;
 	
+	UPROPERTY(EditAnywhere)
+		float lockOn_Thrust = 300;
+
+	UPROPERTY(EditAnywhere)
+		float lockOn_MaxSpeed = 600;
+
+	UPROPERTY(EditAnywhere)
+		float turnSpeed = 45.f;
+
 	UPROPERTY(EditAnywhere)
 		float sensorRange = 1000;
 
@@ -105,6 +118,14 @@ protected:
 
 	bool targetAcquired = false;
 
+	UPROPERTY(ReplicatedUsing = OnRep_LockedTarget)
+		TObjectPtr<AActor> lockedTarget;  // TWeakObjectPtr DOES NOT REPLICATE
+
+	UFUNCTION() void OnRep_LockedTarget();
+
 	float timeLeftToSync = 0.1f;
+
+	float current_Thurst = 0;
+	float current_MaxSpeed = 0;
 
 };

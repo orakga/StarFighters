@@ -24,6 +24,9 @@ void ANetMissile::BeginPlay()
 
 	// SetActorTickInterval( 0.1f );
 
+	current_Thurst = normal_Thrust;
+	current_MaxSpeed = normal_MaxSpeed;
+
 	if (HasAuthority())
 	{
 		if (isHoming)
@@ -61,6 +64,7 @@ void ANetMissile::Tick(float DeltaTime)
 		if (targetAcquired)
 		{
 			// Then CHASE the TARGET
+			ChaseTarget(DeltaTime);
 		}
 		else if (HasAuthority())
 		{
@@ -88,6 +92,7 @@ void ANetMissile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 
 	DOREPLIFETIME_CONDITION(ANetMissile, health, COND_InitialOnly);
 	DOREPLIFETIME_CONDITION(ANetMissile, maxHealth, COND_InitialOnly);
+	DOREPLIFETIME(ANetMissile, lockedTarget);
 }
 
 
@@ -129,11 +134,11 @@ void ANetMissile::Move(float DeltaTime)
 	SetActorRotation(currentVelocity.Rotation());
 
 
-	if (currentVelocity.Size() < maxSpeed)
+	if (currentVelocity.Size() < current_MaxSpeed)
 	{
-		rootComp->AddForce( GetActorForwardVector() * thrust, NAME_None, true );
+		rootComp->AddForce( GetActorForwardVector() * current_Thurst, NAME_None, true );
 	}
-	else if (currentVelocity.Size() > maxSpeed * 1.2) // if the missile is MORE THAN 20% FASTER than the MAX SPEED
+	else if (currentVelocity.Size() > current_MaxSpeed * 1.2) // if the missile is MORE THAN 20% FASTER than the MAX SPEED
 	{
 		// UE_LOG(LogTemp, Warning, TEXT("ANetMissile::Move() SLOW DOWN =====  %f / %f | %s"), currentVelocity.Size(), maxSpeed, *GetDebugName(this));
 		rootComp->SetPhysicsLinearVelocity(currentVelocity * ( 1 - DeltaTime * 0.2f));
@@ -256,7 +261,11 @@ void ANetMissile::ScanForTarget()
 	{
 		// ACQUIRE this NEW TARGET
 		UE_LOG(LogTemp, Error, TEXT("ANetMissile::ScanForTarget() TARGET FOUND | %s"), *GetDebugName(this));
-		Multicast_BroadcastScanResult(closestCandidate->GetActorLocation(), 170, FColor::Red); // DEBUG ONLY =========================
+		
+		AcquireTarget(closestCandidate);
+		
+		// Multicast_BroadcastScanResult(closestCandidate->GetActorLocation(), 170, FColor::Red); // DEBUG ONLY =========================
+
 	}
 	else
 	{
@@ -313,13 +322,15 @@ bool ANetMissile::IsInsideSensorArea(AActor* potentialTarget)
 {
 	FVector vector2Target = potentialTarget->GetActorLocation() - GetActorLocation();
 
+	float sensorBuffer = targetAcquired ? 1.10f : 1.0f;
+
 	// Is the DISTANCE to TARGET less than our SENSOR RANGE?
-	if( vector2Target.Size() > sensorRange ) return false;
+	if( vector2Target.Size() > sensorRange * sensorBuffer ) return false;
 
 
 	// Is the ANGLE to the TARGET within our SENSOR CONE ANGLE?
 	if (SFLibrary::GetAngleBetweenVectors(vector2Target, GetActorForwardVector())
-		> sensorConeAngle * 0.5f)
+		> sensorConeAngle * sensorBuffer * 0.5f)
 	{
 		return false;
 	}
@@ -328,6 +339,117 @@ bool ANetMissile::IsInsideSensorArea(AActor* potentialTarget)
 
 }
 
+
+void ANetMissile::AcquireTarget(AActor* newTarget)
+{
+	lockedTarget = newTarget;
+
+	// EXPLICIT OnRep_() call for FORCE at SERVER
+	OnRep_LockedTarget();
+
+	// Force a NetSync RIGHT NOW
+	SetSyncTimer(0.f);
+}
+
+
+void ANetMissile::OnRep_LockedTarget()
+{
+	UE_LOG(LogTemp, Error, TEXT("ANetMissile::OnRep_LockedTarget() ========================================= "));
+
+	if (IsValid(lockedTarget))
+	{
+		// Switch modes: CHASE MODE
+		targetAcquired = true;
+
+		current_Thurst = lockOn_Thrust;
+		current_MaxSpeed = lockOn_MaxSpeed;
+	}
+	else
+	{
+		// Switch modes: SCAN MODE
+		targetAcquired = false;
+
+		current_Thurst = normal_Thrust;
+		current_MaxSpeed = normal_MaxSpeed;
+	}
+
+}
+
+
+
+void ANetMissile::ChaseTarget(float DeltaTime)
+{
+	// SAFETY CHECK
+	if (!rootComp ) return;
+	if (!IsValid(lockedTarget))
+	{
+		DropTarget();
+		return;
+	}
+
+	// Is the target STILL within Sensor Area?
+	if(HasAuthority() && !IsInsideSensorArea(lockedTarget))
+	{
+		DropTarget();
+		return;
+	}
+
+	// Calculate Missile's current HEADING (angle)
+	float currentHeading = SFLibrary::GetHeadingFromDirection( GetActorForwardVector() ); 
+
+	// Calculate Heading (angle) to TARGET
+	float targetHeading = SFLibrary::GetHeadingFromDirection( lockedTarget->GetActorLocation() - GetActorLocation() );
+
+	float turnAngle = SFLibrary::BoundHeadingAngle(targetHeading - currentHeading);
+
+	float maxTurnAngleThisFrame = turnSpeed * DeltaTime;
+
+	float newHeading;
+
+	if (maxTurnAngleThisFrame >= FMath::Abs(turnAngle))
+	{
+		newHeading = targetHeading;
+	}
+	else
+	{
+		newHeading = currentHeading + maxTurnAngleThisFrame * FMath::Sign(turnAngle);
+	}
+
+	// Turn missile toward newHeading
+	SetActorRotation( FRotator( 0, newHeading, 0) );
+
+	// Make missile MOVE in direction of newHeading
+	float currentSpeed = rootComp->GetPhysicsLinearVelocity().Size();
+	rootComp->SetAllPhysicsLinearVelocity( GetActorForwardVector() * currentSpeed );
+
+	// DEBUG LINE (Point at Target)
+	if (!HasAuthority())
+	{
+		DrawDebugLine(
+			theWorld,
+			lockedTarget->GetActorLocation(),
+			GetActorLocation(),
+			FColor::Red,
+			false,
+			-1,
+			0,
+			4);
+	}
+
+}
+
+
+void ANetMissile::DropTarget()
+{
+	// RESET lockedTarget
+	lockedTarget = nullptr;
+
+	// EXPLICIT OnRep_() call for FORCE at SERVER
+	OnRep_LockedTarget();
+
+	// Force a NetSync RIGHT NOW
+	SetSyncTimer(0.f);
+}
 
 
 void ANetMissile::DestroyProjectile(bool reachedTarget)

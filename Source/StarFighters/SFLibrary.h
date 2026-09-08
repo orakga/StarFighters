@@ -86,4 +86,6 @@ public:
 	static float BoundHeadingAngle(float inHeading);
 
 	static float GetAngleBetweenVectors(FVector vector1, FVector vector2);
+
+	static float GetHeadingFromDirection( FVector direction );
 };
